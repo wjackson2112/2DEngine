@@ -27,3 +27,15 @@
 *.exe
 *.out
 *.app
+
+# Dependancies
+*.d
+
+# Unit Test App
+unit_test
+
+# Directories
+build
+
+# Sublime Text Stuff
+*.sublime-*
