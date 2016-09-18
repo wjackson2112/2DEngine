@@ -9,17 +9,18 @@ CC_FLAGS= -w -std=c++11
 LD_FLAGS= -lSDL2 -lSDL2_image -lSDL2_ttf -lopenal -lalut
 
 INC_PATHS= 	Tests/Catch/single_include	\
-			Asset/include 		\
+			Asset/include 				\
 			Options/include
 INC=		$(foreach d, $(INC_PATHS), -I$d)
 
-SRC_FILES=	Asset/AssetManager.cpp
+SRC_FILES=	Asset/AssetManager.cpp		\
+			Options/OptionsManager.cpp
 SRC=		$(foreach d, $(SRC_FILES), $d)
 SRC_DIRS=   $(foreach d, $(SRC_FILES), $(dir $d))
 
 OBJS = 		$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRC))
 
-TEST_TARGET_NAME = 	unit_test
+TEST_TARGET_NAME = 	./unit_test
 TEST_TARGET = 		$(TEST_TARGET_NAME)
 TEST_SRC_FILES = 	Tests/Tests.cpp
 TEST_SRC =			$(foreach d, $(TEST_SRC_FILES), $d)
@@ -27,7 +28,7 @@ TEST_SRC_DIRS =   	$(foreach d, $(TEST_SRC_FILES), $(dir $d))
 
 TEST_OBJS = 		$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(TEST_SRC))
 
-.PHONY: clean distclean
+.PHONY: clean distclean tests-clean clean-tests dir test-dir tests run tests-run
 
 all: dir
 
@@ -59,6 +60,12 @@ tests-clean:
 	@rm -f $(TEST_TARGET)
 
 clean-tests: tests-clean	
+
+run: all
+	@$(TARGET)
+
+tests-run: tests
+	@$(TEST_TARGET)
 
 distclean:
 	@rm -rf $(BUILD_DIR)

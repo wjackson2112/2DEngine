@@ -24,7 +24,6 @@ private:
 	// unordered_map<string, Sound> sounds;
 	// SDL_Renderer* gRenderer;
 	// Options& options;
-	AssetManager(){};
 	~AssetManager();
 public: 
 	

@@ -8,10 +8,14 @@
 using boost::property_tree::ptree;
 using std::string;
 
-class Options
+class OptionsManager
 {
+	static OptionsManager* instance;
+
 	ptree pt;
 public:
+	static OptionsManager* Instance();
+
 	void write();
 	void read();
 
