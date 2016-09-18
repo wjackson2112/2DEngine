@@ -1,97 +1,100 @@
-#include "Sound.h"
+#include "Sound.hpp"
 
-Sound::Sound(string filename, Options* options)
+string errorToString(ALuint error);
+
+Sound::Sound(string filename)
+	: error(AL_NO_ERROR)
 {
 	ALenum format;
 	ALsizei size;
 	ALsizei freq;
 	ALboolean loop;
 	ALvoid* data;
-	ALuint error;
-
-	this->options = options;
 
 	alGenBuffers(1, &(this->buffer));
-	if(!checkError(__func__)) return;
+	if(hasError()) return;
 
 	alutLoadWAVFile((ALbyte*) filename.c_str(), &format, &data, &size, &freq, &loop);
-	if(!checkError(__func__)) return;
-
+	if(hasError()) return;
 
 	alBufferData(this->buffer, format, data, size, freq);
-	if(!checkError(__func__)) return;
-
+	if(hasError()) return;
+	
 	alutUnloadWAV(format,data,size,freq);
-	if(!checkError(__func__)) return;
-
+	if(hasError()) return;
 
 	alGenSources(1, &(this->source));
-	if(!checkError(__func__)) return;
-
+	if(hasError()) return;
+	
 	alSourcei(source, AL_BUFFER, buffer);
-	if(!checkError(__func__)) return;
+	if(hasError()) return;
 }
 
 Sound::~Sound()
 {
+	cout << "Destructing" << endl;
 	alDeleteSources(1, &source);
 	alDeleteBuffers(1, &buffer);
 }
 
-void Sound::play()
+bool Sound::play()
 {
 	//Apply Master Volume Setting
-	alSourcef(source, AL_GAIN, ((float) stof(options->getValue("sound.volume")))/100);
-
+	alSourcef(source, AL_GAIN, ((float) stof(OptionsManager::Instance().getValue("sound.volume")))/100);
 	alSourcePlay(source);
+	return !hasError();
 }
 
-void Sound::stop()
+bool Sound::stop()
 {
 	alSourceStop(source);
+	return !hasError();
 }
 
-void Sound::rewind()
+bool Sound::rewind()
 {
 	alSourceRewind(source);
+	return !hasError();
 }
 
-void Sound::pause()
+bool Sound::pause()
 {
 	alSourcePause(source);
+	return !hasError();
 }
 
-bool Sound::checkError(string source)
+bool Sound::hasError()
 {
-	ALenum error;
-
-	if((error = alGetError()) != AL_NO_ERROR)
+	ALuint nextError = alGetError();
+	
+	//If there is a new error, update it
+	if((error != AL_NO_ERROR && nextError != AL_NO_ERROR && nextError != error) || (error == AL_NO_ERROR))
 	{
-		std::cout << source << " gave error ";
-		switch(error)
-		{
-			case AL_NO_ERROR:
-				std::cout << "AL_NO_ERROR" << std::endl;
-			case AL_INVALID_NAME:
-				std::cout << "AL_INVALID_NAME" << std::endl;
-				break;
-			case AL_INVALID_ENUM:
-				std::cout << "AL_INVALID_ENUM" << std::endl;
-				break;
-			case AL_INVALID_VALUE:
-				std::cout << "AL_INVALID_VALUE" << std::endl;
-				break;
-			case AL_INVALID_OPERATION:
-				std::cout << "AL_INVALID_OPERATION" << std::endl;
-				break;
-			case AL_OUT_OF_MEMORY:
-				std::cout << "AL_OUT_OF_MEMORY" << std::endl;
-				break;
-			default:
-				std::cout << "UNKNOWN AL ERROR" << std::endl;
-				break;
-		}
-		return false;
+		error = nextError;
 	}
-	return true;
+
+	if(error != AL_NO_ERROR)
+	{
+		return true;
+	}
+	return false;
+}
+
+void Sound::clearError()
+{
+	error = AL_NO_ERROR;
+}
+
+string errorToString(ALuint error)
+{
+	switch(error)
+	{
+		case AL_NO_ERROR: 			return "AL_NO_ERROR";
+		case AL_INVALID_NAME: 		return "AL_INVALID_NAME";
+		case AL_INVALID_ENUM: 		return "AL_INVALID_ENUM";
+		case AL_INVALID_VALUE: 		return "AL_INVALID_VALUE";
+		case AL_INVALID_OPERATION: 	return "AL_INVALID_OPERATION";
+		case AL_OUT_OF_MEMORY: 		return "AL_OUT_OF_MEMORY";
+		default:		  			return "UNKNOWN_ERROR";
+	}
 }

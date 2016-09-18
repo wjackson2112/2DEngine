@@ -8,31 +8,33 @@
 #include <typeinfo>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-// #include "Sound.hpp"
-// #include "Options.h"
-
-#include "SimpleIni.h"
+#include "Sound.hpp"
 
 using namespace std;
 
 class AssetManager {	
 private:
 
-	static AssetManager* instance;
-
-	unordered_map<string, SDL_Texture*> textures;
-	// unordered_map<string, Sound> sounds;
+	// unordered_map<string, SDL_Texture*> textures;
+	unordered_map<string, Sound*> sounds;
 	// SDL_Renderer* gRenderer;
-	// Options& options;
+
+	AssetManager();
 	~AssetManager();
 public: 
 	
-	static AssetManager* Instance();
+	//Meyer's Singleton
+	static AssetManager& Instance()
+	{
+		static AssetManager instance;
+		return instance;
+	}
 
 	template<typename T>	
-	T& getAsset(string key)
+	T* getAsset(string key)
 	{
 		cout << "Type " << typeid(T).name() << " is not supported by the AssetManager" << endl;
+		return NULL;
 	}
 };
 

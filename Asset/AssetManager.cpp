@@ -1,22 +1,23 @@
+#include <AL/alut.h>
 #include "AssetManager.hpp"
 
-AssetManager* AssetManager::instance = NULL;
+using namespace std;
+
+AssetManager::AssetManager()
+{
+	//Init Sound
+	alutInit(0, NULL);
+}
 
 AssetManager::~AssetManager()
 {
 	// textures.clear();
-	// sounds.clear();
+	sounds.clear();
+
+	//Clean Sound
+	alutExit();
 }
 
-AssetManager* AssetManager::Instance()
-{
-	if(!instance)
-	{
-		instance = new AssetManager();
-	}
-
-	return instance;
-}
 
 // template<>
 // SDL_Texture& AssetManager::getAsset<SDL_Texture>(string key)
@@ -39,22 +40,25 @@ AssetManager* AssetManager::Instance()
 // 	return texture;
 // }
 
-// template<>
-// Sound& getAsset<Sound>(string key)
-// {
+template<>
+Sound* AssetManager::getAsset<Sound>(string key)
+{
+	Sound* sound;
 
-// 	Sound& sound;
+	unordered_map<string, Sound*>::iterator it = sounds.find(key);
 
-// 	unordered_map<string, Sound&>::iterator it = sounds.find(key);
+	if(it != sounds.end())
+	{
+		return it->second;
+	}
 
-// 	if(it != sounds.end())
-// 	{
-// 		return it->second;
-// 	}
+	sound = new Sound(key);
+	if(sound->hasError())
+	{
+		delete sound;
+		return NULL;
+	}
 
-// 	//TODO: Make the options globally available
-// 	sound = new Sound(key, this->options);
-
-// 	sounds.insert(make_pair(key, sound));
-// 	return sound;
-// }
+	sounds.insert(make_pair(key, sound));
+	return sound;
+}
