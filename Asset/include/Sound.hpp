@@ -18,7 +18,7 @@ private:
 public:
 	Sound(string filename);
 	~Sound();
-	bool play();
+	bool play(int volume);
 	bool stop();
 	bool rewind();
 	bool pause();

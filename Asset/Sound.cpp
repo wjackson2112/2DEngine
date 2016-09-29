@@ -37,10 +37,16 @@ Sound::~Sound()
 	alDeleteBuffers(1, &buffer);
 }
 
-bool Sound::play()
+bool Sound::play(int volume)
 {
+	if(volume < 0 || volume > 100)
+	{
+		std::cout << "Requested volume of " << volume << " is out of range" << std::endl;
+		return !hasError();
+	}
+
 	//Apply Master Volume Setting
-	alSourcef(source, AL_GAIN, ((float) stof(OptionsManager::Instance().getValue("sound.volume")))/100);
+	alSourcef(source, AL_GAIN, (float) (volume/100));
 	alSourcePlay(source);
 	return !hasError();
 }

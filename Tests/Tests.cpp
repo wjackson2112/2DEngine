@@ -40,7 +40,7 @@ TEST_CASE("Sound")
 
 	SECTION("Play")
 	{
-		REQUIRE(sound->play() == true);
+		REQUIRE(sound->play(0) == true);
 	}
 
 	SECTION("Pause")
