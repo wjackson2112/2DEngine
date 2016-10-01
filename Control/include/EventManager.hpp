@@ -7,9 +7,9 @@
 #include <vector>
 //#include <map>
 //#include "Entity.h"
-#include "IGameEventHandler.h"
-#include "IMouseEventHandler.h"
-#include "IKeyboardEventHandler.h"
+#include "IGameEventHandler.hpp"
+#include "IMouseEventHandler.hpp"
+#include "IKeyboardEventHandler.hpp"
 
 typedef enum GameEvent
 {

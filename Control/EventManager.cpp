@@ -1,4 +1,4 @@
-#include "EventManager.h"
+#include "EventManager.hpp"
 
 //Static singleton vars
 bool EventManager::instanceFlag = false;

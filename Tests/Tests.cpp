@@ -1,7 +1,7 @@
-
 #include "AssetManager.hpp"
 #include "OptionsManager.hpp"
 #include "Sound.hpp"
+#include "WindowManager.hpp"
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -56,5 +56,51 @@ TEST_CASE("Sound")
 	SECTION("Stop")
 	{
 		REQUIRE(sound->stop() == true);
+	}
+}
+
+TEST_CASE("Window")
+{
+	SECTION("Init")
+	{
+		REQUIRE(WindowManager::Instance().init() == true);
+		WindowManager::Instance().close();
+	}
+
+	SECTION("Open")
+	{
+		REQUIRE(WindowManager::Instance().open() == true);
+		WindowManager::Instance().close();
+	}
+
+	SECTION("Name")
+	{
+		REQUIRE(WindowManager::Instance().init() == true);
+		REQUIRE(WindowManager::Instance().setName("Test"));
+		REQUIRE(WindowManager::Instance().open() == true);
+		WindowManager::Instance().close();
+	}
+
+	SECTION("Size")
+	{
+		REQUIRE(WindowManager::Instance().init() == true);
+		REQUIRE(WindowManager::Instance().setSize(800, 600));
+		REQUIRE(WindowManager::Instance().open() == true);
+		WindowManager::Instance().close();
+	}
+
+	SECTION("Renderer")
+	{
+		REQUIRE(WindowManager::Instance().open() == true);
+		REQUIRE(WindowManager::Instance().renderer != NULL);
+		WindowManager::Instance().close();
+	}
+
+	SECTION("Full")
+	{
+		REQUIRE(WindowManager::Instance().init() == true);
+		REQUIRE(WindowManager::Instance().setFull(true));
+		REQUIRE(WindowManager::Instance().open() == true);
+		WindowManager::Instance().close();
 	}
 }

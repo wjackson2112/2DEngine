@@ -2,7 +2,6 @@
 #define IMOUSE_EVENT_HANDLER_H
 
 #include <SDL2/SDL.h>
-#include "EventManager.h"
 
 class IMouseEventHandler
 {
