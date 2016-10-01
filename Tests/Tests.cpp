@@ -2,6 +2,7 @@
 #include "OptionsManager.hpp"
 #include "Sound.hpp"
 #include "WindowManager.hpp"
+#include "EventManager.hpp"
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -17,27 +18,15 @@ TEST_CASE("AssetManager")
 	}
 }
 
-/* Options Manager */
-TEST_CASE("OptionsManager")
-{
-	SECTION("Set and Get Value")
-	{
-		OptionsManager::Instance().setValue("test.value", "test_value");
-		REQUIRE(OptionsManager::Instance().getValue("test.value").compare("test_value") == 0);
-	}
-
-	SECTION("Remove a Value")
-	{
-		OptionsManager::Instance().removeValue("test.value");
-		REQUIRE_THROWS(OptionsManager::Instance().getValue("test.value"));
-		REQUIRE_THROWS(OptionsManager::Instance().getValue("test"));
-	}
-}
-
 TEST_CASE("Sound")
 {
 	Sound* sound = AssetManager::Instance().getAsset<Sound>("./Tests/test_assets/Sound.wav");
 
+	SECTION("Get")
+	{
+		REQUIRE(sound != NULL);
+	}
+	
 	SECTION("Play")
 	{
 		REQUIRE(sound->play(0) == true);
@@ -59,7 +48,24 @@ TEST_CASE("Sound")
 	}
 }
 
-TEST_CASE("Window")
+/* Options Manager */
+TEST_CASE("OptionsManager")
+{
+	SECTION("Set and Get Value")
+	{
+		OptionsManager::Instance().setValue("test.value", "test_value");
+		REQUIRE(OptionsManager::Instance().getValue("test.value").compare("test_value") == 0);
+	}
+
+	SECTION("Remove a Value")
+	{
+		OptionsManager::Instance().removeValue("test.value");
+		REQUIRE_THROWS(OptionsManager::Instance().getValue("test.value"));
+		REQUIRE_THROWS(OptionsManager::Instance().getValue("test"));
+	}
+}
+
+TEST_CASE("WindowManager")
 {
 	SECTION("Init")
 	{
@@ -104,3 +110,45 @@ TEST_CASE("Window")
 		WindowManager::Instance().close();
 	}
 }
+
+TEST_CASE("EventManager")
+{
+	class TestHandler : public IGameEventHandler
+	{
+		void handleGameEvents(vector<int> events)
+		{
+			if(events[0] == 0)
+			{
+				eventOccured = false;
+			} 
+			else 
+			{
+				eventOccured = true;
+			}
+		}
+
+	public:
+		bool eventOccured = false;
+	};
+
+	EventManager* eventManager = new EventManager(1);
+	TestHandler* testHandler = new TestHandler();
+
+	SECTION("Construct")
+	{
+		REQUIRE(eventManager != NULL);
+	}
+
+	SECTION("Report")
+	{
+		eventManager->registerGameEventHandler(testHandler);
+		eventManager->handleGameEvents();
+		REQUIRE(testHandler->eventOccured == false);
+		eventManager->reportGameEvent(0);
+		eventManager->handleGameEvents();
+		REQUIRE(testHandler->eventOccured == true);
+		eventManager->handleGameEvents();
+		REQUIRE(testHandler->eventOccured == false);
+	}
+}
+

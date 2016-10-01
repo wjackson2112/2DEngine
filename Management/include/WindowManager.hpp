@@ -8,8 +8,8 @@
 
 using namespace std;
 
-class WindowManager {
-
+class WindowManager 
+{
 	SDL_Window* window;
 	
 	bool fullscreen;

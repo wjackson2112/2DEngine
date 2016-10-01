@@ -12,8 +12,8 @@
 
 using namespace std;
 
-class AssetManager {	
-private:
+class AssetManager 
+{	
 
 	// unordered_map<string, SDL_Texture*> textures;
 	unordered_map<string, Sound*> sounds;

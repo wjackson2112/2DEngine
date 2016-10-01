@@ -7,12 +7,12 @@ LD_FLAGS= -lSDL2 -lSDL2_image -lSDL2_ttf -lopenal -lalut
 
 INC_PATHS= 	Tests/Catch/single_include	\
 			Asset/include 				\
-			Control/include
+			Management/include
 
 INC=		$(foreach d, $(INC_PATHS), -I$d)
 
 SRC_FILES=	$(wildcard Asset/*.cpp)		\
-			$(wildcard Control/*.cpp)
+			$(wildcard Management/*.cpp)
 
 SRC=		$(foreach d, $(SRC_FILES), $d)
 SRC_DIRS=   $(foreach d, $(SRC_FILES), $(dir $d))
