@@ -6,13 +6,13 @@ CC_FLAGS= -w -std=c++11
 LD_FLAGS= -lSDL2 -lSDL2_image -lSDL2_ttf -lopenal -lalut
 
 INC_PATHS= 	Tests/Catch/single_include	\
-			Asset/include 				\
-			Management/include
+			Management/include			\
+			Entity/include
 
 INC=		$(foreach d, $(INC_PATHS), -I$d)
 
-SRC_FILES=	$(wildcard Asset/*.cpp)		\
-			$(wildcard Management/*.cpp)
+SRC_FILES=	$(wildcard Management/*.cpp) 	\
+			Entity/Sound.cpp
 
 SRC=		$(foreach d, $(SRC_FILES), $d)
 SRC_DIRS=   $(foreach d, $(SRC_FILES), $(dir $d))
