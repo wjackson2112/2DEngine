@@ -1,5 +1,6 @@
 #include "AssetManager.hpp"
 #include "OptionsManager.hpp"
+#include "Sprite.hpp"
 #include "Sound.hpp"
 #include "WindowManager.hpp"
 #include "EventManager.hpp"
@@ -14,7 +15,7 @@ TEST_CASE("AssetManager")
 {
 	SECTION("Get a Sound")
 	{
-		Sound* sound = AssetManager::Instance().getAsset<Sound>("./Tests/test_assets/Sound.wav");
+		Sound* sound = AssetManager::Instance().getAsset<Sound*>("./Tests/test_assets/Sound.wav");
 		REQUIRE(sound != NULL);
 		REQUIRE(sound->hasError() == false);
 	}
@@ -22,7 +23,7 @@ TEST_CASE("AssetManager")
 
 TEST_CASE("Sound")
 {
-	Sound* sound = AssetManager::Instance().getAsset<Sound>("./Tests/test_assets/Sound.wav");
+	Sound* sound = AssetManager::Instance().getAsset<Sound*>("./Tests/test_assets/Sound.wav");
 
 	SECTION("Get")
 	{
@@ -79,6 +80,17 @@ TEST_CASE("WindowManager")
 	{
 		REQUIRE(WindowManager::Instance().open() == true);
 		WindowManager::Instance().close();
+	}
+
+	SECTION("Render")
+	{
+		REQUIRE(WindowManager::Instance().open() == true);
+		Sprite sprite = AssetManager::Instance().getAsset<Sprite>("./Tests/test_assets/Ball.png");
+		sprite.scaleToWidth(30);
+		WindowManager::Instance().clear();
+		sprite.render();
+		WindowManager::Instance().present();
+		WindowManager::Instance().close();	
 	}
 
 	SECTION("Name")

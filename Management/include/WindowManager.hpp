@@ -40,6 +40,8 @@ public:
 
 	bool init();
 	bool open();
+	void clear();
+	void present();
 	void close();
 
 };

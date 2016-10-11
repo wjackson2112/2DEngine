@@ -9,15 +9,15 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "Sound.hpp"
+#include "Sprite.hpp"
 
 using namespace std;
 
 class AssetManager 
 {	
 
-	// unordered_map<string, SDL_Texture*> textures;
+	unordered_map<string, SDL_Texture*> textures;
 	unordered_map<string, Sound*> sounds;
-	// SDL_Renderer* gRenderer;
 
 	AssetManager();
 	~AssetManager();
@@ -31,7 +31,7 @@ public:
 	}
 
 	template<typename T>	
-	T* getAsset(string key)
+	T getAsset(string key)
 	{
 		cout << "Type " << typeid(T).name() << " is not supported by the AssetManager" << endl;
 		return NULL;

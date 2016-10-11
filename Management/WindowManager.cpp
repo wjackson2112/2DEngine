@@ -101,6 +101,10 @@ bool WindowManager::create()
 		return false;
 	}
 
+	//Force the screen to get cleared to black
+	clear();
+	present();
+
 	return true;
 }
 
@@ -113,6 +117,17 @@ bool WindowManager::open()
 
 	//Create Window and Renderer
 	return create();
+}
+
+void WindowManager::clear()
+{
+	SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xFF);
+	SDL_RenderClear(renderer);
+}
+
+void WindowManager::present()
+{
+	SDL_RenderPresent(renderer);
 }
 
 void WindowManager::close()

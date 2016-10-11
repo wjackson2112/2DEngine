@@ -11,7 +11,7 @@ AssetManager::AssetManager()
 
 AssetManager::~AssetManager()
 {
-	// textures.clear();
+	textures.clear();
 	sounds.clear();
 
 	//Clean Sound
@@ -19,29 +19,30 @@ AssetManager::~AssetManager()
 }
 
 
-// template<>
-// SDL_Texture& AssetManager::getAsset<SDL_Texture>(string key)
-// {
-// 	SDL_Texture* texture;
+template<>
+Sprite AssetManager::getAsset<Sprite>(string key)
+{
+	Sprite sprite;
+	SDL_Texture* texture;
 
-// 	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	unordered_map<string, SDL_Texture*>::iterator it = textures.find(key);
 
-// 	unordered_map<string, SDL_Texture&>::iterator it = textures.find(key);
+	if(it != textures.end())
+	{
+		texture = it->second;
+		sprite = Sprite(texture);
+		return sprite;
+	}
 
-// 	if(it != textures.end())
-// 	{
-// 		return it->second;
-// 	}
+	texture = IMG_LoadTexture(WindowManager::Instance().renderer, key.c_str());
+	sprite = Sprite(texture);
 
-// 	//TODO: Make the renderer globally available
-// 	texture = IMG_LoadTexture(gRenderer, key.c_str());
-
-// 	textures.insert(make_pair(key, texture));
-// 	return texture;
-// }
+	textures.insert(make_pair(key, texture));
+	return sprite;
+}
 
 template<>
-Sound* AssetManager::getAsset<Sound>(string key)
+Sound* AssetManager::getAsset<Sound*>(string key)
 {
 	Sound* sound;
 
@@ -52,6 +53,7 @@ Sound* AssetManager::getAsset<Sound>(string key)
 		return it->second;
 	}
 
+	//TODO: Use an actual XML key for this instead of a path
 	sound = new Sound(key);
 	if(sound->hasError())
 	{
