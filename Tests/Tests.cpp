@@ -3,6 +3,8 @@
 #include "Sound.hpp"
 #include "WindowManager.hpp"
 #include "EventManager.hpp"
+#include "Rect.hpp"
+#include "Point.hpp"
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -152,3 +154,65 @@ TEST_CASE("EventManager")
 	}
 }
 
+TEST_CASE("Primitives")
+{
+	SECTION("Pair")
+	{
+		Pair<string> pair = Pair<string>("One", "Two");
+		REQUIRE(pair.x == "One");
+		REQUIRE(pair.y == "Two");
+	}
+
+	SECTION("Point")
+	{
+		Point point = Point(5.5, 10.5);
+		REQUIRE(point.x == 5.5);
+		REQUIRE(point.y == 10.5);
+	}
+
+	SECTION("Size")
+	{
+		Size size = Size(2, 5);
+		REQUIRE(size.x == 2);
+		REQUIRE(size.y == 5);
+	}
+
+	SECTION("Rect")
+	{
+		Rect rect = Rect(Point(2.5,4.5), Size(5,9));
+		
+		REQUIRE(rect.origin().x == 2.5);
+		REQUIRE(rect.origin().y == 4.5);
+		REQUIRE(rect.size().x 	== 5);
+		REQUIRE(rect.size().y 	== 9);
+
+		rect.setOrigin(Point(1.5, 3.5));
+		rect.setSize(Size(4, 8));
+		REQUIRE(rect.origin().x 	== 1.5 );
+		REQUIRE(rect.origin().y 	== 3.5 );
+		REQUIRE(rect.size().x 		== 4   );
+		REQUIRE(rect.size().y 		== 8   );
+		REQUIRE(rect.center().x 	== 3.5 );
+		REQUIRE(rect.center().y 	== 7.5 );
+		REQUIRE(rect.opposite().x 	== 5.5 );
+		REQUIRE(rect.opposite().y 	== 11.5);
+
+		rect.setCenter(Point(1, 1));
+		rect.setSize(Size(2, 2), CENTER);
+		REQUIRE(rect.origin().x 	== 0);
+		REQUIRE(rect.origin().y 	== 0);
+		REQUIRE(rect.size().x 		== 2);
+		REQUIRE(rect.size().y 		== 2);
+		REQUIRE(rect.center().x 	== 1);
+		REQUIRE(rect.center().y 	== 1);
+		REQUIRE(rect.opposite().x 	== 2);
+		REQUIRE(rect.opposite().y 	== 2);
+
+		REQUIRE(rect.contains(Point(0,0)));
+		REQUIRE(rect.contains(Point(0,2)));
+		REQUIRE(rect.contains(Point(2,2)));
+		REQUIRE(rect.contains(Point(2,0)));
+
+		REQUIRE(rect.contains(Point(1,1)));
+	}
+}
