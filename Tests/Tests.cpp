@@ -6,6 +6,7 @@
 #include "EventManager.hpp"
 #include "Rect.hpp"
 #include "Point.hpp"
+#include "StateMachine.hpp"
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -227,4 +228,26 @@ TEST_CASE("Primitives")
 
 		REQUIRE(rect.contains(Point(1,1)));
 	}
+}
+
+typedef enum
+{
+	IDLE,
+	DONE
+} States;
+
+bool called = false;
+void callback(States prev, States curr)
+{
+	called = true;
+}
+
+TEST_CASE("State Machine")
+{
+	StateMachine<States> machine = StateMachine<States>(callback, IDLE);
+	
+	REQUIRE(machine.getState() == IDLE);
+	machine.updateState(DONE);
+	REQUIRE(machine.getState() == DONE);
+	REQUIRE(called == true);
 }
