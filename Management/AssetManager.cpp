@@ -11,8 +11,7 @@ AssetManager::AssetManager()
 
 AssetManager::~AssetManager()
 {
-	textures.clear();
-	sounds.clear();
+	clearAllAssets();
 
 	//Clean Sound
 	alutExit();
@@ -63,4 +62,10 @@ Sound* AssetManager::getAsset<Sound*>(string key)
 
 	sounds.insert(make_pair(key, sound));
 	return sound;
+}
+
+void AssetManager::clearAllAssets()
+{
+	textures.clear();
+	sounds.clear();	
 }

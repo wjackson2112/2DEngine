@@ -9,13 +9,14 @@ INC_PATHS= 	Tests/Catch/single_include	\
 			Asset/include 				\
 			Management/include			\
 			Primitive/include 			\
-			Entity/include
+			Rendering/include
 
 INC=		$(foreach d, $(INC_PATHS), -I$d)
 
 SRC_FILES=	$(wildcard Asset/*.cpp)			\
 			$(wildcard Management/*.cpp) 	\
-			$(wildcard Primitive/*.cpp)
+			$(wildcard Primitive/*.cpp) 	\
+			$(wildcard Rendering/*.cpp)
 
 SRC=		$(foreach d, $(SRC_FILES), $d)
 SRC_DIRS=   $(foreach d, $(SRC_FILES), $(dir $d))

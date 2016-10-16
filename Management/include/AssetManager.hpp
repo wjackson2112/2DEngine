@@ -36,6 +36,8 @@ public:
 		cout << "Type " << typeid(T).name() << " is not supported by the AssetManager" << endl;
 		return NULL;
 	}
+
+	void clearAllAssets();
 };
 
 #endif

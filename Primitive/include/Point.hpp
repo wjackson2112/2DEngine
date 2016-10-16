@@ -1,6 +1,8 @@
 #ifndef PAIR_H
 #define PAIR_H
 
+#include <iostream>
+
 template<class T>
 class Pair
 {
@@ -15,6 +17,12 @@ public:
 	Pair(T x, T y){
 		this->x = x;
 		this->y = y;
+	}
+
+	friend std::ostream& operator<<(std::ostream& os, const Pair& pair)
+	{
+		os << "(" << pair.x << ", " << pair.y << ")";
+		return os;
 	}
 };
 

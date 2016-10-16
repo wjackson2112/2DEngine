@@ -5,17 +5,20 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <AL/alut.h>
+#include <string>
+
+#include "AssetManager.hpp"
+#include "Point.hpp"
 
 using namespace std;
 
 class WindowManager 
 {
-	SDL_Window* window;
+	SDL_Window* mWindow;
 	
-	bool fullscreen;
-	int width;
-	int height;
-	string name;
+	bool mFullscreen;
+	Size mSize;
+	string mName;
 
 	WindowManager();
 	~WindowManager();
@@ -35,7 +38,8 @@ public:
 	}
 
 	bool setName(string name);
-	bool setSize(int width, int height);
+	Size getSize();
+	bool setSize(Size size);
 	bool setFull(bool fullscreen);
 
 	bool init();

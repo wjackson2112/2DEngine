@@ -3,13 +3,13 @@
 
 WindowManager::WindowManager()
 {
-	window = NULL;
+	mWindow = NULL;
 	renderer = NULL;
 }
 
 WindowManager::~WindowManager()
 {
-	window = NULL;
+	mWindow = NULL;
 	renderer = NULL;
 }
 
@@ -17,17 +17,21 @@ bool WindowManager::setName(string name)
 {
 	destroy();
 
-	this->name = name;
+	mName = name;
 
 	return create();
 }
 
-bool WindowManager::setSize(int width, int height)
+Size WindowManager::getSize()
+{
+	return mSize;
+}
+
+bool WindowManager::setSize(Size size)
 {
 	destroy();
 
-	this->width = width;
-	this->height = height;
+	mSize = size;
 
 	return create();
 }
@@ -36,17 +40,16 @@ bool WindowManager::setFull(bool fullscreen)
 {
 	destroy();
 
-	this->fullscreen = fullscreen;
+	mFullscreen = fullscreen;
 
 	return create();
 }
 
 bool WindowManager::init()
 {
-	name = "2DEngine";
-	fullscreen = false;
-	width = 640;
-	height = 480;
+	mName = "2DEngine";
+	mFullscreen = false;
+	mSize = Size(640, 480);
 
 	//Init SDL
 	if(SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0)
@@ -80,19 +83,19 @@ bool WindowManager::init()
 bool WindowManager::create()
 {
 	//Create Window
-	window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
-	if(window == NULL)
+	mWindow = SDL_CreateWindow(mName.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, mSize.x, mSize.y, SDL_WINDOW_SHOWN);
+	if(mWindow == NULL)
 	{
 		printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 		return false;
 	}
 
-	if(fullscreen){
-		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	if(mFullscreen){
+		SDL_SetWindowFullscreen(mWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
 	}
 	
 	//Create Renderer
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	renderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	SDL_RenderClear(renderer);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	if(renderer == NULL)
@@ -110,7 +113,7 @@ bool WindowManager::create()
 
 bool WindowManager::open()
 {
-	if(!window && !renderer && !init())
+	if(!mWindow && !renderer && !init())
 	{
 		return false;
 	}
@@ -121,7 +124,7 @@ bool WindowManager::open()
 
 void WindowManager::clear()
 {
-	SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xFF);
+	SDL_SetRenderDrawColor(renderer, 0x80, 0x80, 0x80, 0xFF);
 	SDL_RenderClear(renderer);
 }
 
@@ -149,10 +152,12 @@ void WindowManager::destroy()
 		renderer = NULL;
 	}
 
-	if(window)
+	if(mWindow)
 	{
-		SDL_DestroyWindow(window);
-		window = NULL;
+		SDL_DestroyWindow(mWindow);
+		mWindow = NULL;
 	}
 	
+	//Reset the AssetManager since the renderer is no good now
+	AssetManager::Instance().clearAllAssets();
 }

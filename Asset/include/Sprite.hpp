@@ -8,20 +8,25 @@
 #include "Rect.hpp"
 #include "WindowManager.hpp"
 
-class Sprite : Rect
+class Sprite
 {
-	SDL_Texture* texture;
+	SDL_Texture* mTexture;
 
 public:
+
+	Size size;
 
 	Sprite();
 	Sprite(SDL_Texture* texture);
 
-	void render();
+	void render(Rect destRect);
 
-	void scale(double scaleFactor);
-	void scaleToWidth(int width);
-	void scaleToHeight(int height);
+	friend bool operator==(const Sprite &sprite1, const Sprite &sprite2);
+	friend bool operator!=(const Sprite &sprite1, const Sprite &sprite2);
+
+	friend std::ostream &operator<<(std::ostream &os, const Sprite& sprite);
 };
+
+
 
 #endif

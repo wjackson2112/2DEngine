@@ -1,6 +1,7 @@
 #include "AssetManager.hpp"
 #include "OptionsManager.hpp"
-#include "Sprite.hpp"
+#include "Entity.hpp"
+#include "Layer.hpp"
 #include "Sound.hpp"
 #include "WindowManager.hpp"
 #include "EventManager.hpp"
@@ -86,10 +87,6 @@ TEST_CASE("WindowManager")
 	SECTION("Render")
 	{
 		REQUIRE(WindowManager::Instance().open() == true);
-		Sprite sprite = AssetManager::Instance().getAsset<Sprite>("./Tests/test_assets/Ball.png");
-		sprite.scaleToWidth(30);
-		WindowManager::Instance().clear();
-		sprite.render();
 		WindowManager::Instance().present();
 		WindowManager::Instance().close();	
 	}
@@ -105,7 +102,7 @@ TEST_CASE("WindowManager")
 	SECTION("Size")
 	{
 		REQUIRE(WindowManager::Instance().init() == true);
-		REQUIRE(WindowManager::Instance().setSize(800, 600));
+		REQUIRE(WindowManager::Instance().setSize(Size(800, 600)));
 		REQUIRE(WindowManager::Instance().open() == true);
 		WindowManager::Instance().close();
 	}
@@ -234,20 +231,171 @@ typedef enum
 {
 	IDLE,
 	DONE
-} States;
+} State;
 
 bool called = false;
-void callback(States prev, States curr)
+State p, c;
+void callback(State prev, State curr)
 {
 	called = true;
+	p = prev;
+	c = curr;
 }
 
 TEST_CASE("State Machine")
 {
-	StateMachine<States> machine = StateMachine<States>(callback, IDLE);
+	StateMachine<State> machine = StateMachine<State>(callback, IDLE);
 	
 	REQUIRE(machine.getState() == IDLE);
 	machine.updateState(DONE);
 	REQUIRE(machine.getState() == DONE);
 	REQUIRE(called == true);
+	REQUIRE(p == IDLE);
+	REQUIRE(c == DONE);
+}
+
+TEST_CASE("Sprite")
+{
+	REQUIRE(WindowManager::Instance().init() == true);
+	REQUIRE(WindowManager::Instance().open() == true);
+
+	Sprite sprite = AssetManager::Instance().getAsset<Sprite>("./Tests/test_assets/Ball.png");
+	Rect renderLocation = Rect(Point(25,25), Size(25,50));
+
+	WindowManager::Instance().clear();
+	sprite.render(renderLocation);
+	WindowManager::Instance().present();
+	WindowManager::Instance().close();
+}
+
+TEST_CASE("Entity")
+{
+	REQUIRE(WindowManager::Instance().init() == true);
+	REQUIRE(WindowManager::Instance().open() == true);
+	Entity entity = Entity("./Tests/test_assets/Ball.png");
+	
+	WindowManager::Instance().clear();
+	entity.render(NULL);
+	WindowManager::Instance().present();
+	
+	entity.update(1);
+
+	WindowManager::Instance().clear();
+	entity.render(NULL);
+	WindowManager::Instance().present();
+	
+	WindowManager::Instance().close();	
+}
+
+TEST_CASE("Layer")
+{
+	REQUIRE(WindowManager::Instance().init() == true);
+	REQUIRE(WindowManager::Instance().open() == true);
+
+	Entity entity1 = Entity("./Tests/test_assets/Ball.png");
+	entity1.setOrigin(Point(0,0));
+	entity1.setSize(Size(25,25));
+
+	Entity entity2 = Entity("./Tests/test_assets/Ball.png");
+	entity2.setOrigin(Point(25,25));
+	entity2.setSize(Size(50,50));
+
+	Layer layer1 = Layer();
+	Layer layer2 = Layer();
+	layer1.add(entity1);
+	layer2.add(entity2);
+
+	WindowManager::Instance().clear();
+	layer1.render(NULL);
+	layer2.render(NULL);
+	WindowManager::Instance().present();
+
+	layer1.update(1);
+	layer2.update(1);
+
+	WindowManager::Instance().clear();
+	layer1.render(NULL);
+	WindowManager::Instance().present();
+
+	WindowManager::Instance().clear();
+	layer2.render(NULL);
+	WindowManager::Instance().present();
+
+	WindowManager::Instance().close();	
+}
+
+TEST_CASE("Camera")
+{
+	REQUIRE(WindowManager::Instance().init() == true);
+	REQUIRE(WindowManager::Instance().open() == true);
+
+	Entity entity1 = Entity("./Tests/test_assets/Ball.png");
+	entity1.setSize(Size(50,50));
+	entity1.setCenter(Point(320,240));
+	
+	Entity entity2 = Entity("./Tests/test_assets/Ball.png");
+	entity2.setSize(Size(50,50));
+	entity2.setOrigin(Point(entity1.origin().x - 50,entity1.origin().y - 50));
+	
+	Entity entity3 = Entity("./Tests/test_assets/Ball.png");
+	entity3.setSize(Size(50,50));
+	entity3.setOrigin(Point(entity1.origin().x + 50,entity1.origin().y + 50));
+
+	Entity entity4 = Entity("./Tests/test_assets/Ball.png");
+	entity4.setSize(Size(50,50));
+	entity4.setOrigin(Point(entity1.origin().x - 50,entity1.origin().y + 50));
+	
+	Entity entity5 = Entity("./Tests/test_assets/Ball.png");
+	entity5.setSize(Size(50,50));
+	entity5.setOrigin(Point(entity1.origin().x + 50,entity1.origin().y - 50));
+	
+	Layer layer = Layer();
+	layer.add(entity1);
+	layer.add(entity2);
+	layer.add(entity3);
+	layer.add(entity4);
+	layer.add(entity5);
+
+	Camera camera = Camera();
+
+	WindowManager::Instance().clear();
+	WindowManager::Instance().present();
+
+	WindowManager::Instance().clear();
+	layer.render(&camera);
+	WindowManager::Instance().present();
+
+	camera.zoomTo(2);
+
+	WindowManager::Instance().clear();
+	layer.render(&camera);
+	WindowManager::Instance().present();
+
+	camera.setHandleRatio(Pair<float>(.25, .25));
+	camera.moveHandleTo(Point(320,240));
+
+	WindowManager::Instance().clear();
+	layer.render(&camera);
+	WindowManager::Instance().present();
+
+	camera.setHandleRatio(Pair<float>(.75, .75));
+	camera.moveHandleTo(Point(320,240));
+
+	WindowManager::Instance().clear();
+	layer.render(&camera);
+	WindowManager::Instance().present();
+
+	camera.zoomTo(3);
+
+	WindowManager::Instance().clear();
+	layer.render(&camera);
+	WindowManager::Instance().present();
+
+	camera.zoomTo(1);
+
+	WindowManager::Instance().clear();
+	layer.render(&camera);
+	WindowManager::Instance().present();
+
+	WindowManager::Instance().close();	
 }

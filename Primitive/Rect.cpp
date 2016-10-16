@@ -88,3 +88,19 @@ bool  Rect::contains(Point point)
 
 	return false;
 }
+
+SDL_Rect Rect::toSDLRect()
+{
+	SDL_Rect sdl_rect;
+	sdl_rect.x = mOrigin.x;
+	sdl_rect.y = mOrigin.y;
+	sdl_rect.w = mSize.x;
+	sdl_rect.h = mSize.y;
+	return sdl_rect;
+}
+
+std::ostream &operator<<(std::ostream &os, const Rect& rect)
+{
+	os << "<Rect " << &rect << ": mOrigin=" << rect.mOrigin << ", mSize=" << rect.mSize << ">";
+	return os;
+}

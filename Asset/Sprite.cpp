@@ -2,44 +2,54 @@
 
 Sprite::Sprite()
 {
-	texture = NULL;
+	mTexture = NULL;
 }
 
 Sprite::Sprite(SDL_Texture* texture)
 {
-	int w,h;
+	int w,h = 0;
 
-	this->texture = texture;
+	mTexture = texture;
 
-	SDL_QueryTexture(this->texture, NULL, NULL, &w, &h);
-	setSize(Size(w, h));
+	if(SDL_QueryTexture(mTexture, NULL, NULL, &w, &h) != 0)
+	{
+		std::cout << SDL_GetError() << std::endl;
+	}
+
+	size = Size(w,h);
 }
 
-void Sprite::render()
+void Sprite::render(Rect destRect)
 {
-	SDL_Rect dstrect; 
-	dstrect.x = origin().x;
-	dstrect.y = origin().y;
-	dstrect.w = size().x;
-	dstrect.h = size().y;
-	SDL_RenderCopy(WindowManager::Instance().renderer, texture, NULL, &dstrect);
+	SDL_Rect destSDLRect = destRect.toSDLRect();
+
+	if(mTexture != NULL)
+	{
+		SDL_RenderCopy(WindowManager::Instance().renderer, mTexture, NULL, &destSDLRect);
+	}
+	//TODO: Else log an error?
 }
 
-void Sprite::scale(double scaleFactor)
+bool operator==(const Sprite &sprite1, const Sprite &sprite2)
 {
-	setSize(Size(size().x * scaleFactor, size().y * scaleFactor));
+	if(sprite1.mTexture == sprite2.mTexture)
+	{
+		return true;
+	}
+	return false;
 }
 
-void Sprite::scaleToWidth(int width)
+bool operator!=(const Sprite &sprite1, const Sprite &sprite2)
 {
-	double scaleFactor = (double) width / (double) size().x;
-
-	scale(scaleFactor);
+	if(sprite1 == sprite2)
+	{
+		return false;
+	}
+	return true;
 }
 
-void Sprite::scaleToHeight(int height)
+std::ostream &operator<<(std::ostream &os, const Sprite& sprite)
 {
-	double scaleFactor = (double) height / (double) size().y;
-
-	scale(scaleFactor);
+	os << "<Sprite " << &sprite << ": mTexture=" << sprite.mTexture << ", size=" << sprite.size << ">";
+	return os;
 }

@@ -1,6 +1,8 @@
 #ifndef RECT_H
 #define RECT_H
 
+#include <SDL2/SDL.h>
+#include <iostream>
 #include "Point.hpp"
 
 typedef enum
@@ -12,6 +14,7 @@ typedef enum
 
 class Rect
 {
+protected:
 	Point mOrigin;
 	Size mSize;
 
@@ -33,6 +36,10 @@ public:
 	void  setOpposite(Point opposite);
 	
 	bool  contains(Point point);
+
+	SDL_Rect toSDLRect();
+
+	friend std::ostream &operator<<(std::ostream &os, const Rect& rect);
 };
 
 #endif
