@@ -14,20 +14,38 @@ Sprite::Sprite(SDL_Texture* texture)
 	if(SDL_QueryTexture(mTexture, NULL, NULL, &w, &h) != 0)
 	{
 		std::cout << SDL_GetError() << std::endl;
+		return;
 	}
 
 	size = Size(w,h);
 }
 
-void Sprite::render(Rect destRect)
+bool Sprite::readyToRender()
+{
+	if(mTexture == NULL)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool Sprite::render(Rect destRect)
 {
 	SDL_Rect destSDLRect = destRect.toSDLRect();
 
-	if(mTexture != NULL)
+	if(!readyToRender())
 	{
-		SDL_RenderCopy(WindowManager::Instance().renderer, mTexture, NULL, &destSDLRect);
+		return false;
 	}
-	//TODO: Else log an error?
+
+	if(SDL_RenderCopy(WindowManager::Instance().renderer, mTexture, NULL, &destSDLRect) != 0)
+	{
+		std::cout << SDL_GetError() << std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 bool operator==(const Sprite &sprite1, const Sprite &sprite2)

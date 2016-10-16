@@ -31,25 +31,25 @@ TEST_CASE("Sound")
 	{
 		REQUIRE(sound != NULL);
 	}
-	
+
 	SECTION("Play")
 	{
-		REQUIRE(sound->play(0) == true);
+		REQUIRE(sound->play(0));
 	}
 
 	SECTION("Pause")
 	{
-		REQUIRE(sound->pause() == true);
+		REQUIRE(sound->pause());
 	}
 
 	SECTION("Rewind")
 	{
-		REQUIRE(sound->rewind() == true);
+		REQUIRE(sound->rewind());
 	}
 
 	SECTION("Stop")
 	{
-		REQUIRE(sound->stop() == true);
+		REQUIRE(sound->stop());
 	}
 }
 
@@ -74,52 +74,53 @@ TEST_CASE("WindowManager")
 {
 	SECTION("Init")
 	{
-		REQUIRE(WindowManager::Instance().init() == true);
-		WindowManager::Instance().close();
+		REQUIRE(WindowManager::Instance().init());
+		REQUIRE(WindowManager::Instance().close());
 	}
 
 	SECTION("Open")
 	{
-		REQUIRE(WindowManager::Instance().open() == true);
-		WindowManager::Instance().close();
+		REQUIRE(WindowManager::Instance().open());
+		REQUIRE(WindowManager::Instance().close());
 	}
 
 	SECTION("Render")
 	{
-		REQUIRE(WindowManager::Instance().open() == true);
-		WindowManager::Instance().present();
-		WindowManager::Instance().close();	
+		REQUIRE(WindowManager::Instance().open());
+		REQUIRE(WindowManager::Instance().clear());
+		REQUIRE(WindowManager::Instance().present());
+		REQUIRE(WindowManager::Instance().close());
 	}
 
 	SECTION("Name")
 	{
-		REQUIRE(WindowManager::Instance().init() == true);
+		REQUIRE(WindowManager::Instance().init());
 		REQUIRE(WindowManager::Instance().setName("Test"));
-		REQUIRE(WindowManager::Instance().open() == true);
-		WindowManager::Instance().close();
+		REQUIRE(WindowManager::Instance().open());
+		REQUIRE(WindowManager::Instance().close());
 	}
 
 	SECTION("Size")
 	{
-		REQUIRE(WindowManager::Instance().init() == true);
+		REQUIRE(WindowManager::Instance().init());
 		REQUIRE(WindowManager::Instance().setSize(Size(800, 600)));
-		REQUIRE(WindowManager::Instance().open() == true);
-		WindowManager::Instance().close();
+		REQUIRE(WindowManager::Instance().open());
+		REQUIRE(WindowManager::Instance().close());
 	}
 
 	SECTION("Renderer")
 	{
-		REQUIRE(WindowManager::Instance().open() == true);
+		REQUIRE(WindowManager::Instance().open());
 		REQUIRE(WindowManager::Instance().renderer != NULL);
-		WindowManager::Instance().close();
+		REQUIRE(WindowManager::Instance().close());
 	}
 
 	SECTION("Full")
 	{
-		REQUIRE(WindowManager::Instance().init() == true);
+		REQUIRE(WindowManager::Instance().init());
 		REQUIRE(WindowManager::Instance().setFull(true));
-		REQUIRE(WindowManager::Instance().open() == true);
-		WindowManager::Instance().close();
+		REQUIRE(WindowManager::Instance().open());
+		REQUIRE(WindowManager::Instance().close());
 	}
 }
 
@@ -132,8 +133,8 @@ TEST_CASE("EventManager")
 			if(events[0] == 0)
 			{
 				eventOccured = false;
-			} 
-			else 
+			}
+			else
 			{
 				eventOccured = true;
 			}
@@ -190,7 +191,7 @@ TEST_CASE("Primitives")
 	SECTION("Rect")
 	{
 		Rect rect = Rect(Point(2.5,4.5), Size(5,9));
-		
+
 		REQUIRE(rect.origin().x == 2.5);
 		REQUIRE(rect.origin().y == 4.5);
 		REQUIRE(rect.size().x 	== 5);
@@ -245,7 +246,7 @@ void callback(State prev, State curr)
 TEST_CASE("State Machine")
 {
 	StateMachine<State> machine = StateMachine<State>(callback, IDLE);
-	
+
 	REQUIRE(machine.getState() == IDLE);
 	machine.updateState(DONE);
 	REQUIRE(machine.getState() == DONE);
@@ -256,41 +257,44 @@ TEST_CASE("State Machine")
 
 TEST_CASE("Sprite")
 {
-	REQUIRE(WindowManager::Instance().init() == true);
-	REQUIRE(WindowManager::Instance().open() == true);
+	REQUIRE(WindowManager::Instance().init());
+	REQUIRE(WindowManager::Instance().open());
 
 	Sprite sprite = AssetManager::Instance().getAsset<Sprite>("./Tests/test_assets/Ball.png");
 	Rect renderLocation = Rect(Point(25,25), Size(25,50));
 
-	WindowManager::Instance().clear();
-	sprite.render(renderLocation);
-	WindowManager::Instance().present();
-	WindowManager::Instance().close();
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(sprite.render(renderLocation));
+	REQUIRE(WindowManager::Instance().present());
+	REQUIRE(WindowManager::Instance().close());
 }
 
 TEST_CASE("Entity")
 {
-	REQUIRE(WindowManager::Instance().init() == true);
-	REQUIRE(WindowManager::Instance().open() == true);
-	Entity entity = Entity("./Tests/test_assets/Ball.png");
-	
-	WindowManager::Instance().clear();
-	entity.render(NULL);
-	WindowManager::Instance().present();
-	
+	Entity entity;
+
+	REQUIRE(WindowManager::Instance().init());
+	REQUIRE(WindowManager::Instance().open());
+
+	entity = Entity("./Tests/test_assets/Ball.png");
+
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(entity.render(NULL));
+	REQUIRE(WindowManager::Instance().present());
+
 	entity.update(1);
 
-	WindowManager::Instance().clear();
-	entity.render(NULL);
-	WindowManager::Instance().present();
-	
-	WindowManager::Instance().close();	
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(entity.render(NULL));
+	REQUIRE(WindowManager::Instance().present());
+
+	REQUIRE(WindowManager::Instance().close());
 }
 
 TEST_CASE("Layer")
 {
-	REQUIRE(WindowManager::Instance().init() == true);
-	REQUIRE(WindowManager::Instance().open() == true);
+	REQUIRE(WindowManager::Instance().init());
+	REQUIRE(WindowManager::Instance().open());
 
 	Entity entity1 = Entity("./Tests/test_assets/Ball.png");
 	entity1.setOrigin(Point(0,0));
@@ -305,23 +309,23 @@ TEST_CASE("Layer")
 	layer1.add(entity1);
 	layer2.add(entity2);
 
-	WindowManager::Instance().clear();
-	layer1.render(NULL);
-	layer2.render(NULL);
-	WindowManager::Instance().present();
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer1.render(NULL));
+	REQUIRE(layer2.render(NULL));
+	REQUIRE(WindowManager::Instance().present());
 
 	layer1.update(1);
 	layer2.update(1);
 
-	WindowManager::Instance().clear();
-	layer1.render(NULL);
-	WindowManager::Instance().present();
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer1.render(NULL));
+	REQUIRE(WindowManager::Instance().present());
 
-	WindowManager::Instance().clear();
-	layer2.render(NULL);
-	WindowManager::Instance().present();
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer2.render(NULL));
+	REQUIRE(WindowManager::Instance().present());
 
-	WindowManager::Instance().close();	
+	REQUIRE(WindowManager::Instance().close());
 }
 
 TEST_CASE("Camera")
@@ -332,11 +336,11 @@ TEST_CASE("Camera")
 	Entity entity1 = Entity("./Tests/test_assets/Ball.png");
 	entity1.setSize(Size(50,50));
 	entity1.setCenter(Point(320,240));
-	
+
 	Entity entity2 = Entity("./Tests/test_assets/Ball.png");
 	entity2.setSize(Size(50,50));
 	entity2.setOrigin(Point(entity1.origin().x - 50,entity1.origin().y - 50));
-	
+
 	Entity entity3 = Entity("./Tests/test_assets/Ball.png");
 	entity3.setSize(Size(50,50));
 	entity3.setOrigin(Point(entity1.origin().x + 50,entity1.origin().y + 50));
@@ -344,11 +348,11 @@ TEST_CASE("Camera")
 	Entity entity4 = Entity("./Tests/test_assets/Ball.png");
 	entity4.setSize(Size(50,50));
 	entity4.setOrigin(Point(entity1.origin().x - 50,entity1.origin().y + 50));
-	
+
 	Entity entity5 = Entity("./Tests/test_assets/Ball.png");
 	entity5.setSize(Size(50,50));
 	entity5.setOrigin(Point(entity1.origin().x + 50,entity1.origin().y - 50));
-	
+
 	Layer layer = Layer();
 	layer.add(entity1);
 	layer.add(entity2);
@@ -358,44 +362,75 @@ TEST_CASE("Camera")
 
 	Camera camera = Camera();
 
-	WindowManager::Instance().clear();
-	WindowManager::Instance().present();
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(WindowManager::Instance().present());
 
-	WindowManager::Instance().clear();
-	layer.render(&camera);
-	WindowManager::Instance().present();
+	sleep(1);
 
-	camera.zoomTo(2);
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer.render(&camera));
+	REQUIRE(WindowManager::Instance().present());
 
-	WindowManager::Instance().clear();
-	layer.render(&camera);
-	WindowManager::Instance().present();
+	sleep(1);
+
+	REQUIRE(camera.zoomTo(2));
+
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer.render(&camera));
+	REQUIRE(WindowManager::Instance().present());
+
+	sleep(1);
 
 	camera.setHandleRatio(Pair<float>(.25, .25));
 	camera.moveHandleTo(Point(320,240));
 
-	WindowManager::Instance().clear();
-	layer.render(&camera);
-	WindowManager::Instance().present();
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer.render(&camera));
+	REQUIRE(WindowManager::Instance().present());
+
+	sleep(1);
 
 	camera.setHandleRatio(Pair<float>(.75, .75));
 	camera.moveHandleTo(Point(320,240));
 
-	WindowManager::Instance().clear();
-	layer.render(&camera);
-	WindowManager::Instance().present();
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer.render(&camera));
+	REQUIRE(WindowManager::Instance().present());
 
-	camera.zoomTo(3);
+	sleep(1);
 
-	WindowManager::Instance().clear();
-	layer.render(&camera);
-	WindowManager::Instance().present();
+	REQUIRE(camera.zoomTo(3));
 
-	camera.zoomTo(1);
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer.render(&camera));
+	REQUIRE(WindowManager::Instance().present());
 
-	WindowManager::Instance().clear();
-	layer.render(&camera);
-	WindowManager::Instance().present();
+	sleep(1);
 
-	WindowManager::Instance().close();	
+	REQUIRE(camera.zoomTo(1));
+
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer.render(&camera));
+	REQUIRE(WindowManager::Instance().present());
+
+	sleep(1);
+
+	REQUIRE(camera.setBoundary(Size(1280,960)));
+	camera.setHandleRatio(Pair<float>(0, 0));
+	// camera.moveHandleTo(Point(100, 100));
+
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer.render(&camera));
+	REQUIRE(WindowManager::Instance().present());
+
+	sleep(1);
+
+	REQUIRE(camera.zoomTo(2));
+	camera.moveHandleTo(Point(100, 100));
+
+	REQUIRE(WindowManager::Instance().clear());
+	REQUIRE(layer.render(&camera));
+	REQUIRE(WindowManager::Instance().present());
+
+	REQUIRE(WindowManager::Instance().close());
 }

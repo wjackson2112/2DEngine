@@ -1,5 +1,10 @@
 #include "Entity.hpp"
 
+Entity::Entity()
+{
+	setOrigin(Point(0,0));
+}
+
 Entity::Entity(string spriteFile)
 {
 	sprites.push_back(AssetManager::Instance().getAsset<Sprite>(spriteFile));
@@ -7,16 +12,23 @@ Entity::Entity(string spriteFile)
 	setSize(sprites[0].size);
 }
 
-void Entity::render(Camera* camera)
+bool Entity::render(Camera* camera)
 {
 	if(camera == NULL)
 	{
-		sprites[0].render(*this);
+		if(sprites[0].render(*this) != true)
+		{
+			return false;
+		}
+		return true;
 	}
-	else
+
+	if(sprites[0].render(camera->apply(*this)) != true)
 	{
-		sprites[0].render(camera->apply(*this));
+		return false;
 	}
+	
+	return true;
 }
 
 void Entity::update(int frameTime)

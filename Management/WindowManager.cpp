@@ -74,8 +74,7 @@ bool WindowManager::init()
 	}
 
 	//Init Sound
-	alutInit(0, NULL);
-	alGetError();	
+	alutInit(NULL, NULL);
 
 	return true;
 }
@@ -86,27 +85,36 @@ bool WindowManager::create()
 	mWindow = SDL_CreateWindow(mName.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, mSize.x, mSize.y, SDL_WINDOW_SHOWN);
 	if(mWindow == NULL)
 	{
-		printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+		std::cout << SDL_GetError() << std::endl;
+		destroy();
 		return false;
 	}
 
-	if(mFullscreen){
-		SDL_SetWindowFullscreen(mWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	if(mFullscreen && SDL_SetWindowFullscreen(mWindow, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0)
+	{
+		std::cout << SDL_GetError() << std::endl;
+		destroy();
+		return false;
 	}
-	
+
 	//Create Renderer
 	renderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	SDL_RenderClear(renderer);
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	if(renderer == NULL)
 	{
-		printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
+		std::cout << SDL_GetError() << std::endl;
+		destroy();
 		return false;
 	}
 
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+
 	//Force the screen to get cleared to black
-	clear();
-	present();
+	if(!clear() || !present())
+	{
+		destroy();
+		return false;
+	}
 
 	return true;
 }
@@ -122,18 +130,30 @@ bool WindowManager::open()
 	return create();
 }
 
-void WindowManager::clear()
+bool WindowManager::clear()
 {
-	SDL_SetRenderDrawColor(renderer, 0x80, 0x80, 0x80, 0xFF);
-	SDL_RenderClear(renderer);
+	if(SDL_RenderClear(renderer) != 0)
+	{
+		std::cout << SDL_GetError() << std::endl;
+		return false;
+	}
+
+	return true;
 }
 
-void WindowManager::present()
+bool WindowManager::present()
 {
+	if(renderer == NULL)
+	{
+		return false;
+	}
+
 	SDL_RenderPresent(renderer);
+
+	return true;
 }
 
-void WindowManager::close()
+bool WindowManager::close()
 {
 	//Destroy Window and Renderer
 	destroy();
@@ -142,9 +162,11 @@ void WindowManager::close()
 	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
+
+	return true;
 }
 
-void WindowManager::destroy()
+bool WindowManager::destroy()
 {
 	if(renderer)
 	{
@@ -160,4 +182,6 @@ void WindowManager::destroy()
 	
 	//Reset the AssetManager since the renderer is no good now
 	AssetManager::Instance().clearAllAssets();
+
+	return true;
 }

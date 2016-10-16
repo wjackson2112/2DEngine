@@ -15,18 +15,18 @@ class Camera
 
 	void applyBoundary();
 	Rect applyZoom(Rect input);
-	Rect applyTranslation(Rect input); 
+	Rect applyTranslation(Rect input);
 	float zoom();
 	Point handle();
 
 public:
 	Camera();
 
-	void setBoundary(Size boundary);
+	bool setBoundary(Size boundary);
 	void setHandleRatio(Pair<float> handleRatio);
 
 	void moveHandleTo(Point handle);
-	void zoomTo(float zoom);
+	bool zoomTo(float zoom);
 
 	Rect apply(Rect input);
 };

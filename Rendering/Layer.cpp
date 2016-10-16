@@ -9,12 +9,16 @@ Layer::~Layer()
 	clear();
 }
 
-void Layer::render(Camera* camera)
+bool Layer::render(Camera* camera)
 {
 	for(auto &entity : entities)
 	{
-		entity.render(camera);
+		if(entity.render(camera) == false)
+		{
+			return false;
+		}
 	}
+	return true;
 }
 void Layer::update(int frameTime)
 {

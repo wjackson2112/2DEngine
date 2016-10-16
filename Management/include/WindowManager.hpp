@@ -9,6 +9,7 @@
 
 #include "AssetManager.hpp"
 #include "Point.hpp"
+#include "Sound.hpp"
 
 using namespace std;
 
@@ -24,7 +25,7 @@ class WindowManager
 	~WindowManager();
 
 	bool create();
-	void destroy();
+	bool destroy();
 
 public:
 
@@ -44,9 +45,9 @@ public:
 
 	bool init();
 	bool open();
-	void clear();
-	void present();
-	void close();
+	bool clear();
+	bool present();
+	bool close();
 
 };
 

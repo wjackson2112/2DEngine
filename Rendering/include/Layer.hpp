@@ -16,7 +16,7 @@ private:
 public:
 	~Layer();
 
-	void render(Camera* camera);
+	bool render(Camera* camera);
 	void update(int frameTime);
 
 	void add(Entity entity);

@@ -19,7 +19,8 @@ public:
 	Sprite();
 	Sprite(SDL_Texture* texture);
 
-	void render(Rect destRect);
+	bool readyToRender();
+	bool render(Rect destRect);
 
 	friend bool operator==(const Sprite &sprite1, const Sprite &sprite2);
 	friend bool operator!=(const Sprite &sprite1, const Sprite &sprite2);

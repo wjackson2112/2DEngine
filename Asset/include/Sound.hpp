@@ -27,4 +27,6 @@ public:
 	void clearError();
 };
 
+string errorToString(ALuint error);
+
 #endif

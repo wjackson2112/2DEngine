@@ -12,7 +12,7 @@ void Camera::applyBoundary()
 	if(mView.origin().x < 0)
 	{
 		mView.setOrigin(Point(0.0, mView.origin().y));
-	}	
+	}
 
 	if(mView.origin().y < 0)
 	{
@@ -35,18 +35,14 @@ float Camera::zoom()
 	return mBoundary.x / mView.size().x;
 }
 
-void Camera::setBoundary(Size boundary)
+bool Camera::setBoundary(Size boundary)
 {
-	//Can't let the zoom go less than 1.0
-	if((zoom() < 1.0) || 
-	   (zoom() < 1.0))
-	{
-		return;
-	}
-
 	mBoundary = boundary;
+	zoomTo(1);
 
 	applyBoundary();
+
+	return true;
 }
 
 void Camera::setHandleRatio(Pair<float> handleRatio)
@@ -59,7 +55,7 @@ Point Camera::handle()
 	double x = mView.origin().x + (mView.size().x * mHandleRatio.x);
 	double y = mView.origin().y + (mView.size().y * mHandleRatio.y);
 
-	return Point(x, y); 
+	return Point(x, y);
 }
 
 void Camera::moveHandleTo(Point handle)
@@ -72,14 +68,14 @@ void Camera::moveHandleTo(Point handle)
 	applyBoundary();
 }
 
-void Camera::zoomTo(float zoom)
+bool Camera::zoomTo(float zoom)
 {
 	Size viewSize;
 
 	if(zoom < 1.0)
 	{
 		//TODO: Maybe log an error or something here?
-		return;
+		return false;
 	}
 
 	Point handleLoc = handle();
@@ -90,15 +86,21 @@ void Camera::zoomTo(float zoom)
 	moveHandleTo(handleLoc);
 
 	applyBoundary();
+
+	return true;
 }
 
 Rect Camera::applyTranslation(Rect input)
 {
 	Point origin = input.origin();
 	Size size = input.size();
-	
+
 	origin.x -= mView.center().x - mBoundary.x/2;
 	origin.y -= mView.center().y - mBoundary.y/2;
+
+	//Apply world boundary vs camera zoom
+	origin.x /= mBoundary.x/WindowManager::Instance().getSize().x;
+	origin.y /= mBoundary.x/WindowManager::Instance().getSize().x;
 
 	return Rect(origin, size);
 }
@@ -114,6 +116,10 @@ Rect Camera::applyZoom(Rect input)
 	size.x *= zoom();
 	size.y *= zoom();
 
+	//Apply world boundary vs camera zoom
+	size.x /= mBoundary.x/WindowManager::Instance().getSize().x;
+	size.y /= mBoundary.x/WindowManager::Instance().getSize().x;
+
 	return Rect(origin, size);
 }
 
@@ -123,6 +129,6 @@ Rect Camera::apply(Rect input)
 
 	output = applyZoom(input);
 	output = applyTranslation(output);
-	
+
 	return output;
 }
