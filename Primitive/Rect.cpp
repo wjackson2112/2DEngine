@@ -34,7 +34,6 @@ void  Rect::setSize(Size size)
 
 void  Rect::setSize(Size size, Anchor anchor)
 {
-	
 	switch(anchor)
 	{
 		case ORIGIN:
@@ -97,6 +96,20 @@ SDL_Rect Rect::toSDLRect()
 	sdl_rect.w = mSize.x;
 	sdl_rect.h = mSize.y;
 	return sdl_rect;
+}
+
+bool Rect::intersects(Shape& shape)
+{
+	if(dynamic_cast<Rect*>(&shape))
+	{
+		SDL_Rect a = this->toSDLRect();
+		SDL_Rect b = ((Rect*) &shape)->toSDLRect();
+
+		return SDL_HasIntersection(&a, &b);
+		// return true;
+	}
+
+	return false;
 }
 
 std::ostream &operator<<(std::ostream &os, const Rect& rect)

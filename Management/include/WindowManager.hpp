@@ -13,10 +13,10 @@
 
 using namespace std;
 
-class WindowManager 
+class WindowManager
 {
 	SDL_Window* mWindow;
-	
+
 	bool mFullscreen;
 	Size mSize;
 	string mName;
@@ -24,8 +24,12 @@ class WindowManager
 	WindowManager();
 	~WindowManager();
 
+
 	bool create();
 	bool destroy();
+
+	bool created;
+	bool opened;
 
 public:
 

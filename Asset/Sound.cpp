@@ -19,20 +19,19 @@ Sound::Sound(string filename)
 
 	alBufferData(this->buffer, format, data, size, freq);
 	if(hasError()) return;
-	
+
 	alutUnloadWAV(format,data,size,freq);
 	if(hasError()) return;
 
 	alGenSources(1, &(this->source));
 	if(hasError()) return;
-	
+
 	alSourcei(source, AL_BUFFER, buffer);
 	if(hasError()) return;
 }
 
 Sound::~Sound()
 {
-	cout << "Destructing" << endl;
 	alDeleteSources(1, &source);
 	alDeleteBuffers(1, &buffer);
 }
@@ -72,7 +71,7 @@ bool Sound::pause()
 bool Sound::hasError()
 {
 	ALuint nextError = alGetError();
-	
+
 	//If there is a new error, update it
 	if((error != AL_NO_ERROR && nextError != AL_NO_ERROR && nextError != error) || (error == AL_NO_ERROR))
 	{

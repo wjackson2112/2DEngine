@@ -5,21 +5,43 @@ WindowManager::WindowManager()
 {
 	mWindow = NULL;
 	renderer = NULL;
+	created = false;
+	opened = false;
 }
 
 WindowManager::~WindowManager()
 {
+	close();
+	alutExit();
+	IMG_Quit();
+	TTF_Quit();
+	SDL_Quit();
 	mWindow = NULL;
 	renderer = NULL;
+	created = false;
+	opened = false;
 }
 
 bool WindowManager::setName(string name)
 {
-	destroy();
-
-	mName = name;
-
-	return create();
+	if(opened)
+	{
+		close();
+		init();
+		mName = name;
+		return open();
+	}
+	else if(created)
+	{
+		destroy();
+		mName = name;
+		return create();
+	}
+	else
+	{
+		mName = name;
+		return true;
+	}
 }
 
 Size WindowManager::getSize()
@@ -29,20 +51,46 @@ Size WindowManager::getSize()
 
 bool WindowManager::setSize(Size size)
 {
-	destroy();
-
-	mSize = size;
-
-	return create();
+	if(opened)
+	{
+		close();
+		mSize = size;
+		init();
+		return open();
+	}
+	else if(created)
+	{
+		destroy();
+		mSize = size;
+		return create();
+	}
+	else
+	{
+		mSize = size;
+		return true;
+	}
 }
 
 bool WindowManager::setFull(bool fullscreen)
 {
-	destroy();
-
-	mFullscreen = fullscreen;
-
-	return create();
+	if(opened)
+	{
+		close();
+		mFullscreen = fullscreen;
+		init();
+		return open();
+	}
+	else if(created)
+	{
+		destroy();
+		mFullscreen = fullscreen;
+		return create();
+	}
+	else
+	{
+		mFullscreen = fullscreen;
+		return true;
+	}
 }
 
 bool WindowManager::init()
@@ -81,7 +129,13 @@ bool WindowManager::init()
 
 bool WindowManager::create()
 {
+	created = true;
+
 	//Create Window
+	if(mWindow != NULL)
+	{
+		std::cout << "ERROR: WINDOW ALREADY EXISTS" << std::endl;
+	}
 	mWindow = SDL_CreateWindow(mName.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, mSize.x, mSize.y, SDL_WINDOW_SHOWN);
 	if(mWindow == NULL)
 	{
@@ -98,6 +152,10 @@ bool WindowManager::create()
 	}
 
 	//Create Renderer
+	if(renderer != NULL)
+	{
+		std::cout << "ERROR: RENDERER ALREADY EXISTS" << std::endl;
+	}
 	renderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if(renderer == NULL)
 	{
@@ -121,13 +179,22 @@ bool WindowManager::create()
 
 bool WindowManager::open()
 {
-	if(!mWindow && !renderer && !init())
+	opened = true;
+	create();
+
+	if(mWindow == NULL)
 	{
+		std::cout << "ERROR: Window not initialized before trying to open" << std::endl;
+		return false;
+	}
+	if(renderer == NULL)
+	{
+		std::cout << "ERROR: Renderer not initialized before trying to open" << std::endl;
 		return false;
 	}
 
 	//Create Window and Renderer
-	return create();
+	return true;
 }
 
 bool WindowManager::clear()
@@ -155,31 +222,29 @@ bool WindowManager::present()
 
 bool WindowManager::close()
 {
+	opened = false;
 	//Destroy Window and Renderer
 	destroy();
-
-	alutExit();
-	IMG_Quit();
-	TTF_Quit();
-	SDL_Quit();
 
 	return true;
 }
 
 bool WindowManager::destroy()
 {
-	if(renderer)
+	created = false;
+
+	if(renderer != NULL)
 	{
 		SDL_DestroyRenderer(renderer);
 		renderer = NULL;
 	}
 
-	if(mWindow)
+	if(mWindow != NULL)
 	{
 		SDL_DestroyWindow(mWindow);
 		mWindow = NULL;
 	}
-	
+
 	//Reset the AssetManager since the renderer is no good now
 	AssetManager::Instance().clearAllAssets();
 

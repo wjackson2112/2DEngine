@@ -67,5 +67,9 @@ Sound* AssetManager::getAsset<Sound*>(string key)
 void AssetManager::clearAllAssets()
 {
 	textures.clear();
-	sounds.clear();	
+	for(auto sound : sounds)
+	{
+		delete sound.second;
+	}
+	sounds.clear();
 }

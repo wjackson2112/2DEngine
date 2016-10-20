@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <iostream>
+#include "Shape.hpp"
 #include "Point.hpp"
 
 typedef enum
@@ -12,7 +13,7 @@ typedef enum
 	OPPOSITE
 } Anchor;
 
-class Rect
+class Rect : public Shape
 {
 protected:
 	Point mOrigin;
@@ -24,20 +25,21 @@ public:
 
 	Point origin();
 	void  setOrigin(Point origin);
-	
+
 	Size  size();
 	void  setSize(Size size);
 	void  setSize(Size size, Anchor anchor);
-	
+
 	Point center();
 	void  setCenter(Point center);
-	
+
 	Point opposite();
 	void  setOpposite(Point opposite);
-	
+
 	bool  contains(Point point);
 
 	SDL_Rect toSDLRect();
+	bool  intersects(Shape& shape);
 
 	friend std::ostream &operator<<(std::ostream &os, const Rect& rect);
 };

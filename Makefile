@@ -2,7 +2,7 @@ CC = g++
 
 BUILD_DIR = build
 
-CC_FLAGS= -w -std=c++11
+CC_FLAGS= -w -std=c++11 -g
 LD_FLAGS= -lSDL2 -lSDL2_image -lSDL2_ttf -lopenal -lalut
 
 INC_PATHS= 	Tests/Catch/single_include	\
@@ -62,13 +62,16 @@ tests-clean:
 	@$(foreach d, $(TEST_SRC_DIRS), $(shell rm -rf $(BUILD_DIR)/$d))
 	@rm -f $(TEST_TARGET)
 
-clean-tests: tests-clean	
+clean-tests: tests-clean
 
 run: all
 	@$(TARGET)
 
 tests-run: tests
 	@$(TEST_TARGET)
+
+tests-debug: tests
+	@ddd $(TEST_TARGET)
 
 distclean:
 	@rm -rf $(BUILD_DIR)

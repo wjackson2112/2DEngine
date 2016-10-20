@@ -11,9 +11,8 @@
 
 class Entity : public Rect
 {
-	vector<Sprite> sprites;
-	//TODO: There should also be a vector of colliders here
-
+protected:
+	Sprite sprite;
 public:
 	Entity();
 	Entity(string spriteFile);

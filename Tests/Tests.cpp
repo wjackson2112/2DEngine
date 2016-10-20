@@ -8,6 +8,7 @@
 #include "Rect.hpp"
 #include "Point.hpp"
 #include "StateMachine.hpp"
+#include "Collider.hpp"
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -72,25 +73,35 @@ TEST_CASE("OptionsManager")
 
 TEST_CASE("WindowManager")
 {
+
+
 	SECTION("Init")
 	{
 		REQUIRE(WindowManager::Instance().init());
 		REQUIRE(WindowManager::Instance().close());
 	}
 
+
+
 	SECTION("Open")
 	{
+		REQUIRE(WindowManager::Instance().init());
 		REQUIRE(WindowManager::Instance().open());
 		REQUIRE(WindowManager::Instance().close());
 	}
 
+
+
 	SECTION("Render")
 	{
+		REQUIRE(WindowManager::Instance().init());
 		REQUIRE(WindowManager::Instance().open());
 		REQUIRE(WindowManager::Instance().clear());
 		REQUIRE(WindowManager::Instance().present());
 		REQUIRE(WindowManager::Instance().close());
 	}
+
+
 
 	SECTION("Name")
 	{
@@ -100,6 +111,8 @@ TEST_CASE("WindowManager")
 		REQUIRE(WindowManager::Instance().close());
 	}
 
+
+
 	SECTION("Size")
 	{
 		REQUIRE(WindowManager::Instance().init());
@@ -108,12 +121,17 @@ TEST_CASE("WindowManager")
 		REQUIRE(WindowManager::Instance().close());
 	}
 
+
+
 	SECTION("Renderer")
 	{
+		REQUIRE(WindowManager::Instance().init());
 		REQUIRE(WindowManager::Instance().open());
 		REQUIRE(WindowManager::Instance().renderer != NULL);
 		REQUIRE(WindowManager::Instance().close());
 	}
+
+
 
 	SECTION("Full")
 	{
@@ -365,21 +383,15 @@ TEST_CASE("Camera")
 	REQUIRE(WindowManager::Instance().clear());
 	REQUIRE(WindowManager::Instance().present());
 
-	sleep(1);
-
 	REQUIRE(WindowManager::Instance().clear());
 	REQUIRE(layer.render(&camera));
 	REQUIRE(WindowManager::Instance().present());
-
-	sleep(1);
 
 	REQUIRE(camera.zoomTo(2));
 
 	REQUIRE(WindowManager::Instance().clear());
 	REQUIRE(layer.render(&camera));
 	REQUIRE(WindowManager::Instance().present());
-
-	sleep(1);
 
 	camera.setHandleRatio(Pair<float>(.25, .25));
 	camera.moveHandleTo(Point(320,240));
@@ -388,8 +400,6 @@ TEST_CASE("Camera")
 	REQUIRE(layer.render(&camera));
 	REQUIRE(WindowManager::Instance().present());
 
-	sleep(1);
-
 	camera.setHandleRatio(Pair<float>(.75, .75));
 	camera.moveHandleTo(Point(320,240));
 
@@ -397,23 +407,17 @@ TEST_CASE("Camera")
 	REQUIRE(layer.render(&camera));
 	REQUIRE(WindowManager::Instance().present());
 
-	sleep(1);
-
 	REQUIRE(camera.zoomTo(3));
 
 	REQUIRE(WindowManager::Instance().clear());
 	REQUIRE(layer.render(&camera));
 	REQUIRE(WindowManager::Instance().present());
 
-	sleep(1);
-
 	REQUIRE(camera.zoomTo(1));
 
 	REQUIRE(WindowManager::Instance().clear());
 	REQUIRE(layer.render(&camera));
 	REQUIRE(WindowManager::Instance().present());
-
-	sleep(1);
 
 	REQUIRE(camera.setBoundary(Size(1280,960)));
 	camera.setHandleRatio(Pair<float>(0, 0));
@@ -423,8 +427,6 @@ TEST_CASE("Camera")
 	REQUIRE(layer.render(&camera));
 	REQUIRE(WindowManager::Instance().present());
 
-	sleep(1);
-
 	REQUIRE(camera.zoomTo(2));
 	camera.moveHandleTo(Point(100, 100));
 
@@ -433,4 +435,52 @@ TEST_CASE("Camera")
 	REQUIRE(WindowManager::Instance().present());
 
 	REQUIRE(WindowManager::Instance().close());
+}
+
+class CParent : public ColliderParent
+{
+public:
+	bool calledBack;
+
+	CParent()
+	{
+		reset();
+	}
+
+	void reset()
+	{
+		calledBack = false;
+	}
+
+	void colliderCallback(ColliderParent* collidedObject)
+	{
+		calledBack = true;
+	}
+
+	void negotiateCollision(ColliderParent* collidedObject)
+	{
+
+	}
+};
+
+TEST_CASE("Collider")
+{
+	CParent* parent = new CParent();
+	Rect aRect = Rect(Point(0,0), Size(50,50));
+	Rect bRect = Rect(Point(25,25), Size(50,50));
+
+	Collider a = Collider(aRect, 100, parent);
+	Collider b = Collider(bRect, 50, parent);
+	REQUIRE(intersects(a,b));
+	resolveCollisions(a,b);
+	REQUIRE(parent->calledBack == true);
+	parent->reset();
+
+	bRect = Rect(Point(100,100), Size(50,50));
+	REQUIRE(intersects(a,b) == false);
+	REQUIRE(parent->calledBack == false);
+	resolveCollisions(a,b);
+	REQUIRE(parent->calledBack == false);
+
+	delete parent;
 }
