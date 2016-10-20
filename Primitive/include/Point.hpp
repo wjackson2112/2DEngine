@@ -2,6 +2,7 @@
 #define PAIR_H
 
 #include <iostream>
+#include <cmath>
 
 template<class T>
 class Pair
@@ -28,5 +29,7 @@ public:
 
 typedef Pair<double> Point;
 typedef Pair<int>    Size;
+
+double distance(Point a, Point b);
 
 #endif
