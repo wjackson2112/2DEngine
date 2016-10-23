@@ -6,6 +6,8 @@
 #include "WindowManager.hpp"
 #include "EventManager.hpp"
 #include "Rect.hpp"
+#include "Circle.hpp"
+#include "Line.hpp"
 #include "Point.hpp"
 #include "StateMachine.hpp"
 #include "Collider.hpp"
@@ -206,6 +208,19 @@ TEST_CASE("Primitives")
 		REQUIRE(size.y == 5);
 	}
 
+	SECTION("Line")
+	{
+		//Crossing lines - (X)
+		Line line = Line(Point(0,0), Point(5,5));
+
+		REQUIRE(line.a().x == 0);
+		REQUIRE(line.a().y == 0);
+		REQUIRE(line.b().x == 5);
+		REQUIRE(line.b().y == 5);
+
+		REQUIRE(line.contains(Point(2.5,2.5)));
+	}
+
 	SECTION("Rect")
 	{
 		Rect rect = Rect(Point(2.5,4.5), Size(5,9));
@@ -237,12 +252,280 @@ TEST_CASE("Primitives")
 		REQUIRE(rect.opposite().x 	== 2);
 		REQUIRE(rect.opposite().y 	== 2);
 
-		REQUIRE(rect.contains(Point(0,0)));
-		REQUIRE(rect.contains(Point(0,2)));
-		REQUIRE(rect.contains(Point(2,2)));
-		REQUIRE(rect.contains(Point(2,0)));
+		REQUIRE(rect.contains(Point(0,0)) == false);
+		REQUIRE(rect.contains(Point(0,2)) == false);
+		REQUIRE(rect.contains(Point(2,2)) == false);
+		REQUIRE(rect.contains(Point(2,0)) == false);
 
 		REQUIRE(rect.contains(Point(1,1)));
+	}
+
+	SECTION("Circle")
+	{
+		Circle circle = Circle(Point(5,5), 5);
+		REQUIRE(circle.center().x == 5);
+		REQUIRE(circle.center().y == 5);
+		REQUIRE(circle.radius() == 5);
+
+		REQUIRE(circle.contains(Point(5,5)));
+		REQUIRE(circle.contains(Point(5,0)) == false);
+		REQUIRE(circle.contains(Point(0,5)) == false);
+		REQUIRE(circle.contains(Point(10,5)) == false);
+		REQUIRE(circle.contains(Point(5,10)) == false);
+		REQUIRE(circle.contains(Point(0,0)) == false);
+		REQUIRE(circle.contains(Point(10,10)) == false);
+
+		circle.setCenter(Point(10,10));
+		circle.setRadius(10);
+
+		REQUIRE(circle.center().x == 10);
+		REQUIRE(circle.center().y == 10);
+		REQUIRE(circle.radius() == 10);
+	}
+
+	SECTION("Intersections")
+	{
+		//Line vs Line
+		{
+			Line line1, line2;
+
+			//Lines that cross - (X)
+			line1 = Line(Point(0,0), Point(5,5));
+			line2 = Line(Point(0,5), Point(5,0));
+			REQUIRE(line1.intersects(line2));
+			REQUIRE(line2.intersects(line1));
+
+			//Lines that intersect and one point on one line is on the other line - (T)
+			line1 = Line(Point(0,0), Point(0,5));
+			line2 = Line(Point(0,2.5), Point(5,2.5));
+			REQUIRE(line1.intersects(line2));
+			REQUIRE(line2.intersects(line1));
+
+			//Lines that intersect at one end - (V)
+			line2 = Line(Point(0,0), Point(5,0));
+			REQUIRE(line1.intersects(line2));
+			REQUIRE(line2.intersects(line1));
+
+			//Parallel lines - (||)
+			line2 = Line(Point(5,0), Point(5,5));
+			REQUIRE(line1.intersects(line2) == false);
+			REQUIRE(line2.intersects(line1) == false);
+
+			//Crossing lines that don't intersect - (|/)
+			line2 = Line(Point(10,0), Point(5,5));
+			REQUIRE(line1.intersects(line2) == false);
+			REQUIRE(line2.intersects(line1) == false);
+
+			//Lines that touch end to end (--)
+			line2 = Line(Point(0,5), Point(0,10));
+			REQUIRE(line1.intersects(line2));
+			REQUIRE(line2.intersects(line1));
+		}
+
+		//Line vs Rect
+		{
+			Line line;
+			Rect rect;
+
+			rect = Rect(Point(5,5), Size(5,5));
+
+			//Line inside the Rect
+			line = Line(Point(6,6), Point(9,9));
+			REQUIRE(line.intersects(rect));
+			REQUIRE(rect.intersects(line));
+
+			//Line intersects the right edge of the Rect
+			line = Line(Point(7.5, 7.5), Point(12.5, 7.5));
+			REQUIRE(line.intersects(rect));
+			REQUIRE(rect.intersects(line));
+
+			//Line intersects the top edge of the Rect
+			line = Line(Point(7.5, 7.5), Point(7.5, 2.5));
+			REQUIRE(line.intersects(rect));
+			REQUIRE(rect.intersects(line));
+
+			//Line intersects the left edge of the Rect
+			line = Line(Point(7.5, 7.5), Point(2.5, 7.5));
+			REQUIRE(line.intersects(rect));
+			REQUIRE(rect.intersects(line));
+
+			//Line intersects the bottom edge of the Rect
+			line = Line(Point(7.5, 7.5), Point(7.5, 12.5));
+			REQUIRE(line.intersects(rect));
+			REQUIRE(rect.intersects(line));
+
+			//Line does not intersect the Rect
+			line = Line(Point(0,0), Point(1,1));
+			REQUIRE(line.intersects(rect) == false);
+			REQUIRE(rect.intersects(line) == false);
+
+			//Line goes all the way through the Rect horizontally
+			line = Line(Point(2.5, 7.5), Point(12.5, 7.5));
+			REQUIRE(line.intersects(rect));
+			REQUIRE(rect.intersects(line));
+
+			//Line goes all the way through the Rect vertically
+			line = Line(Point(7.5, 2.5), Point(7.5, 12.5));
+			REQUIRE(line.intersects(rect));
+			REQUIRE(rect.intersects(line));
+
+			//Line goes through the left and bottom of the Rect
+			line = Line(Point(7.5, 2.5), Point(12.5, 7.5));
+			REQUIRE(line.intersects(rect));
+			REQUIRE(rect.intersects(line));
+		}
+
+		//Line vs Circle
+		{
+			Line line;
+			Circle circle;
+
+			//Both points on the line are inside the circle
+			line = Line(Point(4,5), Point(6,5));
+			circle = Circle(Point(5,5), 5);
+			REQUIRE(line.intersects(circle));
+			REQUIRE(circle.intersects(line));
+
+			//One point on the line is inside the circle
+			line = Line(Point(0,0), Point(5,5));
+			REQUIRE(line.intersects(circle));
+			REQUIRE(circle.intersects(line));
+
+			//The line goes through the circle
+			line = Line(Point(0,0), Point(10,10));
+			REQUIRE(line.intersects(circle));
+			REQUIRE(circle.intersects(line));
+
+			//The line goes through the circle, but one point is on the edge
+			line = Line(Point(0,0), Point(10,5));
+			REQUIRE(line.intersects(circle));
+			REQUIRE(circle.intersects(line));
+
+			//The line doesn't go through the circle, but one point is on the edge
+			line = Line(Point(0,0), Point(0,5));
+			REQUIRE(line.intersects(circle) == false);
+			REQUIRE(circle.intersects(line) == false);
+
+			//The line doesn't touch the circle
+			line = Line(Point(0,20), Point(20,20));
+			REQUIRE(line.intersects(circle) == false);
+			REQUIRE(circle.intersects(line) == false);
+		}
+
+		//Rect vs Rect
+		{
+			Rect rect1, rect2;
+
+			//Overlapping Rects of same size
+			rect1 = Rect(Point(0,0), Size(10,10));
+			rect2 = Rect(Point(5,5), Size(10,10));
+			REQUIRE(rect1.intersects(rect2));
+			REQUIRE(rect2.intersects(rect1));
+
+			//Overlapping Rects that are exactly on top of one another
+			rect2 = Rect(Point(0,0), Size(10,10));
+			REQUIRE(rect1.intersects(rect2));
+			REQUIRE(rect2.intersects(rect1));
+
+			//Overlapping Rects where one is completely inside another
+			rect2 = Rect(Point(2.5,2.5), Size(5,5));
+			REQUIRE(rect1.intersects(rect2));
+			REQUIRE(rect2.intersects(rect1));
+
+			//Rects that touch only on an edge
+			rect2 = Rect(Point(0,10), Size(10,10));
+			REQUIRE(rect1.intersects(rect2) == false);
+			REQUIRE(rect2.intersects(rect1) == false);
+
+			//Rects that touch only at one point
+			rect2 = Rect(Point(10,10), Size(10,10));
+			REQUIRE(rect1.intersects(rect2) == false);
+			REQUIRE(rect2.intersects(rect1) == false);
+
+			//Rects that do not touch
+			rect2 = Rect(Point(20,20), Size(10,10));
+			REQUIRE(rect1.intersects(rect2) == false);
+			REQUIRE(rect2.intersects(rect1) == false);
+		}
+
+		//Rect vs Circle
+		{
+			Rect rect;
+			Circle circle;
+
+			//Rect inside Circle
+			rect = Rect(Point(4.50, 4.50), Size(1,1));
+			circle = Circle(Point(5,5),5);
+			REQUIRE(rect.intersects(circle));
+			REQUIRE(circle.intersects(rect));
+
+			//Circle inside Rect
+			rect = Rect(Point(0,0), Size(10,10));
+			circle = Circle(Point(5,5),.5);
+			REQUIRE(rect.intersects(circle));
+			REQUIRE(circle.intersects(rect));
+
+			//Circle intersects Rect with circle's center in rect
+			circle = Circle(Point(8,8), 5);
+			REQUIRE(rect.intersects(circle));
+			REQUIRE(circle.intersects(rect));
+
+			//Circle intersects Rect with circle's center on rect
+			circle = Circle(Point(10,10), 5);
+			REQUIRE(rect.intersects(circle));
+			REQUIRE(circle.intersects(rect));
+
+			//Circle intersects Rect with circle's center outside rect
+			circle = Circle(Point(12,12), 5);
+			REQUIRE(rect.intersects(circle));
+			REQUIRE(circle.intersects(rect));
+
+			//Circle touches Rect on edge
+			circle = Circle(Point(15,5), 5);
+			REQUIRE(rect.intersects(circle) == false);
+			REQUIRE(circle.intersects(rect) == false);
+
+			//Circle does not intersect Rect
+			circle = Circle(Point(20,20), 1);
+			REQUIRE(rect.intersects(circle) == false);
+			REQUIRE(circle.intersects(rect) == false);
+		}
+
+		//Circle vs Circle
+		{
+			Circle circle1, circle2;
+
+			//Circle in circle
+			circle1 = Circle(Point(5,5), 5);
+			circle2 = Circle(Point(5,5), 2);
+			REQUIRE(circle1.intersects(circle2));
+			REQUIRE(circle2.intersects(circle1));
+
+			//Circle with center in other circle
+			circle2 = Circle(Point(9,5), 5);
+			REQUIRE(circle1.intersects(circle2));
+			REQUIRE(circle2.intersects(circle1));
+
+			//Circle with center on other circle
+			circle2 = Circle(Point(10,5), 5);
+			REQUIRE(circle1.intersects(circle2));
+			REQUIRE(circle2.intersects(circle1));
+
+			//Circle with center out of other circle
+			circle2 = Circle(Point(11,5), 5);
+			REQUIRE(circle1.intersects(circle2));
+			REQUIRE(circle2.intersects(circle1));
+
+			//Circles touch
+			circle2 = Circle(Point(15,5), 5);
+			REQUIRE(circle1.intersects(circle2) == false);
+			REQUIRE(circle2.intersects(circle1) == false);
+
+			//Circles do not intersect
+			circle2 = Circle(Point(20,5), 5);
+			REQUIRE(circle1.intersects(circle2) == false);
+			REQUIRE(circle2.intersects(circle1) == false);
+		}
 	}
 }
 

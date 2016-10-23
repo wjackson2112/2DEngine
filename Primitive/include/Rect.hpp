@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include "Shape.hpp"
+#include "Line.hpp"
 #include "Point.hpp"
 
 typedef enum
@@ -40,6 +41,11 @@ public:
 
 	SDL_Rect toSDLRect();
 	bool  intersects(Shape& shape);
+
+	Line  right();
+	Line  top();
+	Line  left();
+	Line  bottom();
 
 	friend std::ostream &operator<<(std::ostream &os, const Rect& rect);
 };

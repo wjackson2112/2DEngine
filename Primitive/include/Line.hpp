@@ -7,6 +7,7 @@
 #include "Shape.hpp"
 #include "Point.hpp"
 
+
 class Line : public Shape
 {
 protected:
@@ -28,5 +29,7 @@ public:
 
 	friend std::ostream &operator<<(std::ostream &os, const Line& line);
 };
+
+double distance(Point point, Line line);
 
 #endif

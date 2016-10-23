@@ -10,7 +10,7 @@ class Circle : public Shape
 {
 protected:
 	Point mCenter;
-	int mRadius;
+	double mRadius;
 
 public:
 	Circle();

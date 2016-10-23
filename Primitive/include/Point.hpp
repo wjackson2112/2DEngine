@@ -4,6 +4,13 @@
 #include <iostream>
 #include <cmath>
 
+typedef enum
+{
+	COLINEAR,
+	CLOCKWISE,
+	COUNTER_CLOCKWISE
+} Orientation;
+
 template<class T>
 class Pair
 {
@@ -28,8 +35,9 @@ public:
 };
 
 typedef Pair<double> Point;
-typedef Pair<int>    Size;
+typedef Pair<double> Size;
 
 double distance(Point a, Point b);
+Orientation orientation(Point a, Point b, Point c);
 
 #endif

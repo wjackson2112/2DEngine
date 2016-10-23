@@ -1,5 +1,7 @@
 #include "Rect.hpp"
 
+#include "Circle.hpp"
+
 Rect::Rect()
 {
 	mOrigin = Point(0,0);
@@ -77,10 +79,10 @@ void  Rect::setOpposite(Point opposite)
 
 bool  Rect::contains(Point point)
 {
-	if(point.x >= mOrigin.x &&
-	   point.x <= opposite().x &&
-	   point.y >= mOrigin.y &&
-	   point.y <= opposite().y)
+	if(point.x > mOrigin.x &&
+	   point.x < opposite().x &&
+	   point.y > mOrigin.y &&
+	   point.y < opposite().y)
 	{
 		return true;
 	}
@@ -106,10 +108,59 @@ bool Rect::intersects(Shape& shape)
 		SDL_Rect b = ((Rect*) &shape)->toSDLRect();
 
 		return SDL_HasIntersection(&a, &b);
-		// return true;
+	}
+	else if(dynamic_cast<Line*>(&shape))
+	{
+		Line* line = (Line*) &shape;
+
+		return line->intersects(*this);
+	}
+	else if(dynamic_cast<Circle*>(&shape))
+	{
+		Circle* circle = (Circle*) &shape;
+
+		if(top().intersects(*circle) ||
+		   left().intersects(*circle) ||
+		   right().intersects(*circle) ||
+		   bottom().intersects(*circle))
+		{
+			return true;
+		}
+
+		Rect boundingRect = Rect(Point(origin().x-circle->radius(),
+								       origin().y-circle->radius()),
+								 Size(size().x+circle->radius()*2,
+								      size().y+circle->radius()*2));
+
+		if(boundingRect.contains(circle->center()))
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	return false;
+}
+
+Line  Rect::right()
+{
+	return Line(Point(opposite().x, origin().y), opposite());
+}
+
+Line  Rect::top()
+{
+	return Line(origin(), Point(opposite().x, origin().y));
+}
+
+Line  Rect::left()
+{
+	return Line(Point(origin().x, opposite().y), origin());
+}
+
+Line  Rect::bottom()
+{
+	return Line(opposite(), Point(origin().x, opposite().y));
 }
 
 std::ostream &operator<<(std::ostream &os, const Rect& rect)
