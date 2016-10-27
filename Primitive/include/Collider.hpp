@@ -13,11 +13,14 @@ public:
 
 class Collider
 {
-	Shape& mShape;
-	const int mPriority;
+
+	Shape* mShape;
+	int mPriority;
 	ColliderParent* mParent;
+
 public:
-	Collider(Shape& shape, int priority, ColliderParent* parent)
+
+	Collider(Shape* shape, int priority, ColliderParent* parent)
 		: mShape{shape}, mPriority{priority}, mParent(parent){};
 
 	~Collider()
@@ -33,7 +36,8 @@ public:
 
 	friend bool intersects(Collider a, Collider b)
 	{
-		return a.mShape.intersects(b.mShape);
+
+		return a.mShape->intersects(b.mShape);
 	}
 
 	friend void resolveCollisions(Collider a, Collider b)
@@ -57,6 +61,13 @@ public:
 				}
 			}
 		}
+	}
+
+	void operator=(const Collider &collider)
+	{
+		mShape = collider.mShape;
+		mPriority = collider.mPriority;
+		mParent = collider.mParent;
 	}
 };
 

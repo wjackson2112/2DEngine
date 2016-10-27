@@ -100,29 +100,29 @@ SDL_Rect Rect::toSDLRect()
 	return sdl_rect;
 }
 
-bool Rect::intersects(Shape& shape)
+bool Rect::intersects(Shape* shape)
 {
-	if(dynamic_cast<Rect*>(&shape))
+	if(dynamic_cast<Rect*>(shape))
 	{
 		SDL_Rect a = this->toSDLRect();
-		SDL_Rect b = ((Rect*) &shape)->toSDLRect();
+		SDL_Rect b = ((Rect*) shape)->toSDLRect();
 
 		return SDL_HasIntersection(&a, &b);
 	}
-	else if(dynamic_cast<Line*>(&shape))
+	else if(dynamic_cast<Line*>(shape))
 	{
-		Line* line = (Line*) &shape;
+		Line* line = (Line*) shape;
 
-		return line->intersects(*this);
+		return line->intersects(this);
 	}
-	else if(dynamic_cast<Circle*>(&shape))
+	else if(dynamic_cast<Circle*>(shape))
 	{
-		Circle* circle = (Circle*) &shape;
+		Circle* circle = (Circle*) shape;
 
-		if(top().intersects(*circle) ||
-		   left().intersects(*circle) ||
-		   right().intersects(*circle) ||
-		   bottom().intersects(*circle))
+		if(top().intersects(circle) ||
+		   left().intersects(circle) ||
+		   right().intersects(circle) ||
+		   bottom().intersects(circle))
 		{
 			return true;
 		}

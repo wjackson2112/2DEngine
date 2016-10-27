@@ -6,7 +6,7 @@
 class Shape
 {
 public:
-	virtual bool intersects(Shape& shape) = 0;
+	virtual bool intersects(Shape* shape) = 0;
 	virtual bool contains(Point point) = 0;
 };
 

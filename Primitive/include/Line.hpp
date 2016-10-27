@@ -25,7 +25,7 @@ public:
 	double length();
 
 	bool  contains(Point point);
-	bool  intersects(Shape& shape);
+	bool  intersects(Shape* shape);
 
 	friend std::ostream &operator<<(std::ostream &os, const Line& line);
 };

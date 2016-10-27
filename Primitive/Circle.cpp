@@ -40,23 +40,23 @@ bool  Circle::contains(Point point)
 	}
 	return false;
 }
-bool  Circle::intersects(Shape& shape)
+bool  Circle::intersects(Shape* shape)
 {
-	if(dynamic_cast<Line*>(&shape))
+	if(dynamic_cast<Line*>(shape))
 	{
-		Line* line = (Line*) &shape;
+		Line* line = (Line*) shape;
 
-		return line->intersects(*this);
+		return line->intersects(this);
 	}
-	else if(dynamic_cast<Rect*>(&shape))
+	else if(dynamic_cast<Rect*>(shape))
 	{
-		Rect* rect = (Rect*) &shape;
+		Rect* rect = (Rect*) shape;
 
-		return rect->intersects(*this);
+		return rect->intersects(this);
 	}
-	else if(dynamic_cast<Circle*>(&shape))
+	else if(dynamic_cast<Circle*>(shape))
 	{
-		Circle* other = (Circle*) &shape;
+		Circle* other = (Circle*) shape;
 
 		if(radius() + other->radius() > distance(center(), other->center()))
 		{

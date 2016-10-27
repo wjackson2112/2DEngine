@@ -43,12 +43,12 @@ bool  Line::contains(Point point)
 	}
 	return false;
 }
-bool  Line::intersects(Shape& shape)
+bool  Line::intersects(Shape* shape)
 {
 
-	if(dynamic_cast<Line*>(&shape))
+	if(dynamic_cast<Line*>(shape))
 	{
-		Line* other = (Line*) &shape;
+		Line* other = (Line*) shape;
 
 		//Calculate the 4 orientations
 		Orientation o1 = orientation(a(), b(), other->a());
@@ -82,9 +82,9 @@ bool  Line::intersects(Shape& shape)
 
 		return false;
 	}
-	else if(dynamic_cast<Rect*>(&shape))
+	else if(dynamic_cast<Rect*>(shape))
 	{
-		Rect* rect = (Rect*) &shape;
+		Rect* rect = (Rect*) shape;
 
 		Line top, right, bottom, left;
 
@@ -100,19 +100,19 @@ bool  Line::intersects(Shape& shape)
 		left = rect->left();
 
 		//If the line intesects any of the rectangles edges
-		if(intersects(top) ||
-		   intersects(right) ||
-		   intersects(bottom) ||
-		   intersects(left))
+		if(intersects(&top) ||
+		   intersects(&right) ||
+		   intersects(&bottom) ||
+		   intersects(&left))
 		{
 			return true;
 		}
 
 		return false;
 	}
-	else if(dynamic_cast<Circle*>(&shape))
+	else if(dynamic_cast<Circle*>(shape))
 	{
-		Circle* circle = (Circle*) &shape;
+		Circle* circle = (Circle*) shape;
 
 		if(distance(circle->center(), *this) < circle->radius())
 		{

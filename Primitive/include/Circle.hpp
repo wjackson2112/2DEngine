@@ -23,7 +23,7 @@ public:
 	void  setCenter(Point center);
 
 	bool  contains(Point point);
-	bool  intersects(Shape& shape);
+	bool  intersects(Shape* shape);
 
 	friend std::ostream &operator<<(std::ostream &os, const Circle& circle);
 };

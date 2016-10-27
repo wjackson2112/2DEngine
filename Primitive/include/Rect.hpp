@@ -40,7 +40,7 @@ public:
 	bool  contains(Point point);
 
 	SDL_Rect toSDLRect();
-	bool  intersects(Shape& shape);
+	bool  intersects(Shape* shape);
 
 	Line  right();
 	Line  top();
