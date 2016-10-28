@@ -6,6 +6,8 @@ using namespace std;
 AssetManager::AssetManager()
 {
 	//Init Sound
+	textures = {};
+	sounds = {};
 	alutInit(0, NULL);
 }
 
@@ -66,10 +68,18 @@ Sound* AssetManager::getAsset<Sound*>(string key)
 
 void AssetManager::clearAllAssets()
 {
-	textures.clear();
-	for(auto sound : sounds)
+	if(textures.size() != 0)
 	{
-		delete sound.second;
+		textures.clear();
 	}
-	sounds.clear();
+
+	if(sounds.size() != 0)
+	{
+		for(auto sound : sounds)
+		{
+			delete sound.second;
+		}
+
+		sounds.clear();
+	}
 }

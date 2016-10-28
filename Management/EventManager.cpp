@@ -54,7 +54,7 @@ void EventManager::registerMouseEventHandler(IMouseEventHandler* handler)
 
 void EventManager::unregisterMouseEventHandler(IMouseEventHandler* handler)
 {
-	unregisterEventHandler(this->mouseEventHandlers, handler);	
+	unregisterEventHandler(this->mouseEventHandlers, handler);
 }
 
 void EventManager::registerKeyboardEventHandler(IKeyboardEventHandler* handler)
@@ -64,7 +64,17 @@ void EventManager::registerKeyboardEventHandler(IKeyboardEventHandler* handler)
 
 void EventManager::unregisterKeyboardEventHandler(IKeyboardEventHandler* handler)
 {
-	unregisterEventHandler(this->keyboardEventHandlers, handler);	
+	unregisterEventHandler(this->keyboardEventHandlers, handler);
+}
+
+void EventManager::registerSDLEventHandler(ISDLEventHandler* handler)
+{
+	registerEventHandler(this->sdlEventHandlers, handler);
+}
+
+void EventManager::unregisterSDLEventHandler(ISDLEventHandler* handler)
+{
+	unregisterEventHandler(this->sdlEventHandlers, handler);
 }
 
 void EventManager::handleMouseEvents()
@@ -84,7 +94,7 @@ void EventManager::handleMouseEvents()
 			{
 				handler->handleMousePress(i, x, y);
 			}
-		} 
+		}
 		else if(!(mouseState & SDL_BUTTON(i)) && prevMouseState & SDL_BUTTON(i))
 		{
 			for(auto &handler : mouseEventHandlers)
@@ -127,4 +137,17 @@ void EventManager::handleGameEvents()
 		handler->handleGameEvents(gameEvents);
 	}
 	this->clearGameEvents();
+}
+
+void EventManager::handleSDLEvents()
+{
+	SDL_Event event;
+
+	while(SDL_PollEvent(&event))
+	{
+		for(auto &handler : sdlEventHandlers)
+		{
+			handler->handleSDLEvent(event);
+		}
+	}
 }
