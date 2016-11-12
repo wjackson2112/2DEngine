@@ -119,6 +119,13 @@ bool Rect::intersects(Shape* shape)
 	{
 		Circle* circle = (Circle*) shape;
 
+		//If the circle's center is inside, then intersection
+		if(contains(circle->center()))
+		{
+			return true;
+		}
+
+		//If any side intersects the circle, then intersection
 		if(top().intersects(circle) ||
 		   left().intersects(circle) ||
 		   right().intersects(circle) ||
@@ -127,14 +134,63 @@ bool Rect::intersects(Shape* shape)
 			return true;
 		}
 
-		Rect boundingRect = Rect(Point(origin().x-circle->radius(),
-								       origin().y-circle->radius()),
-								 Size(size().x+circle->radius()*2,
-								      size().y+circle->radius()*2));
+		Rect wideBoundingRect = Rect(Point(origin().x-circle->radius(),
+								           origin().y-circle->radius()),
+								      Size(size().x+circle->radius()*2,
+								           size().y+circle->radius()*2));
 
-		if(boundingRect.contains(circle->center()))
+		//If center in box that is size of box + radius of circle
+		if(wideBoundingRect.contains(circle->center()))
 		{
-			return true;
+			//If in left box
+			Rect leftBoundingRect = Rect(Point(origin().x - circle->radius(),
+				                               origin().y),
+										  Size(circle->radius(),
+										  	   size().y));
+			if(leftBoundingRect.contains(circle->center()))
+			{
+				return true;
+			}
+
+			//If in right box
+			Rect rightBoundingRect = Rect(Point(opposite().x,
+				                               origin().y),
+										  Size(circle->radius(),
+										  	   size().y));
+			if(rightBoundingRect.contains(circle->center()))
+			{
+				return true;
+			}
+
+			//If in upper box
+			Rect upperBoundingRect = Rect(Point(origin().x,
+				                               origin().y - circle->radius()),
+										  Size(size().x,
+										  	   circle->radius()));
+			if(upperBoundingRect.contains(circle->center()))
+			{
+				return true;
+			}
+
+			//If in lower box
+			Rect lowerBoundingRect = Rect(Point(origin().x,
+				                               opposite().y),
+										  Size(size().x,
+										  	   circle->radius()));
+			if(lowerBoundingRect.contains(circle->center()))
+			{
+				return true;
+			}
+
+
+			//If inside rounded corners
+			if(distance(pointA(), circle->center()) < circle->radius() ||
+			   distance(pointB(), circle->center()) < circle->radius() ||
+			   distance(pointC(), circle->center()) < circle->radius() ||
+			   distance(pointD(), circle->center()) < circle->radius())
+			{
+				return true;
+			}
 		}
 
 		return false;
@@ -143,24 +199,48 @@ bool Rect::intersects(Shape* shape)
 	return false;
 }
 
+// B-A
+// | |
+// C-D
+
+Point Rect::pointA()
+{
+	return Point(opposite().x, origin().y);
+}
+
+Point Rect::pointB()
+{
+	return origin();
+}
+
+Point Rect::pointC()
+{
+	return Point(origin().x, opposite().y);
+}
+
+Point Rect::pointD()
+{
+	return opposite();
+}
+
 Line  Rect::right()
 {
-	return Line(Point(opposite().x, origin().y), opposite());
+	return Line(pointA(), opposite());
 }
 
 Line  Rect::top()
 {
-	return Line(origin(), Point(opposite().x, origin().y));
+	return Line(origin(), pointA());
 }
 
 Line  Rect::left()
 {
-	return Line(Point(origin().x, opposite().y), origin());
+	return Line(pointC(), origin());
 }
 
 Line  Rect::bottom()
 {
-	return Line(opposite(), Point(origin().x, opposite().y));
+	return Line(opposite(), pointC());
 }
 
 std::ostream &operator<<(std::ostream &os, const Rect& rect)

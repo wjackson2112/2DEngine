@@ -11,7 +11,7 @@ using namespace std;
 class Layer
 {
 private:
-	vector<Entity> entities;
+	vector<Entity*> entities;
 
 public:
 	~Layer();
@@ -19,8 +19,8 @@ public:
 	bool render(Camera* camera);
 	void update(int frameTime);
 
-	void add(Entity entity);
-	void remove(Entity entity);
+	void add(Entity* entity);
+	void remove(Entity* entity);
 	void clear();
 };
 

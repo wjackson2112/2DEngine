@@ -10,6 +10,7 @@
 class Camera
 {
 	Size  		mBoundary;
+	Rect 		mUnscaledView;
 	Rect 		mView;
 	Pair<float> mHandleRatio;
 

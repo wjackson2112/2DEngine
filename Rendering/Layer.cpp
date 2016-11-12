@@ -13,7 +13,7 @@ bool Layer::render(Camera* camera)
 {
 	for(auto &entity : entities)
 	{
-		if(entity.render(camera) == false)
+		if(entity->render(camera) == false)
 		{
 			return false;
 		}
@@ -24,15 +24,15 @@ void Layer::update(int frameTime)
 {
 	for(auto &entity : entities)
 	{
-		entity.update(frameTime);
+		entity->update(frameTime);
 	}
 }
 
-void Layer::add(Entity entity)
+void Layer::add(Entity* entity)
 {
 	entities.push_back(entity);
 }
-void Layer::remove(Entity entity)
+void Layer::remove(Entity* entity)
 {
 	entities.erase(std::remove(entities.begin(), entities.end(), entity), entities.end());
 }

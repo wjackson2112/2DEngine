@@ -140,8 +140,28 @@ double distance(Point point, Line line)
 	double x2 = line.b().x;
 	double y2 = line.b().y;
 
-	double numer = abs((y2-y1)*x0 - (x2-x1)*y0 + x2*y1 - y2*x1);
-	double denom = sqrt(pow(y2-y1,2) + pow(x2-x1,2));
 
-	return numer/denom;
+	if((x0 < x1 && x0 < x2) ||
+	   (x0 > x1 && x0 > x2) ||
+	   (y0 < y1 && y0 < y2) ||
+	   (y0 > y1 && y0 > y2))
+	{
+		double distToA = distance(point, line.a());
+		double distToB = distance(point, line.b());
+		if(distToA < distToB)
+		{
+			return distToA;
+		}
+		else
+		{
+			return distToB;
+		}
+	}
+	else
+	{
+		double numer = abs((y2-y1)*x0 - (x2-x1)*y0 + x2*y1 - y2*x1);
+		double denom = sqrt(pow(y2-y1,2) + pow(x2-x1,2));
+
+		return numer/denom;
+	}
 }

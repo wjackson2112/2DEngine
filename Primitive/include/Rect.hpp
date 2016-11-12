@@ -47,6 +47,14 @@ public:
 	Line  left();
 	Line  bottom();
 
+	// B-A
+	// | |
+	// C-D
+	Point pointA();
+	Point pointB();
+	Point pointC();
+	Point pointD();
+
 	friend std::ostream &operator<<(std::ostream &os, const Rect& rect);
 };
 

@@ -17,8 +17,8 @@ public:
 	Entity();
 	Entity(string spriteFile);
 
-	bool render(Camera* camera);
-	void update(int frameTime);
+	virtual bool render(Camera* camera);
+	virtual void update(int frameTime);
 
 	friend bool operator==(const Entity& entity1, const Entity& entity2);
 	friend bool operator!=(const Entity& entity1, const Entity& entity2);

@@ -9,6 +9,11 @@ Camera::Camera()
 
 void Camera::applyBoundary()
 {
+	double windowRatio = WindowManager::Instance().getSize().y/WindowManager::Instance().getSize().x;
+	double worldRatio = mBoundary.y / mBoundary.x;
+
+	double scaleRatio = worldRatio / windowRatio;
+
 	if(mView.origin().x < 0)
 	{
 		mView.setOrigin(Point(0.0, mView.origin().y));
@@ -37,8 +42,12 @@ float Camera::zoom()
 
 bool Camera::setBoundary(Size boundary)
 {
+	double aspectRatio = WindowManager::Instance().getSize().x/WindowManager::Instance().getSize().y;
+
 	mBoundary = boundary;
 	zoomTo(1);
+
+	mUnscaledView = Rect(Point(0,0), Size(boundary.x, boundary.x / aspectRatio));
 
 	applyBoundary();
 
@@ -80,7 +89,7 @@ bool Camera::zoomTo(float zoom)
 
 	Point handleLoc = handle();
 
-	viewSize = Size(mBoundary.x / zoom, mBoundary.y / zoom);
+	viewSize = Size(mUnscaledView.size().x / zoom, mUnscaledView.size().y / zoom);
 	mView.setSize(viewSize);
 
 	moveHandleTo(handleLoc);
@@ -95,12 +104,12 @@ Rect Camera::applyTranslation(Rect input)
 	Point origin = input.origin();
 	Size size = input.size();
 
-	origin.x -= mView.center().x - mBoundary.x/2;
-	origin.y -= mView.center().y - mBoundary.y/2;
+	origin.x -= mView.center().x - mUnscaledView.size().x/2;
+	origin.y -= mView.center().y - mUnscaledView.size().y/2;
 
 	//Apply world boundary vs camera zoom
-	origin.x /= mBoundary.x/WindowManager::Instance().getSize().x;
-	origin.y /= mBoundary.x/WindowManager::Instance().getSize().x;
+	origin.x /= mUnscaledView.size().x/WindowManager::Instance().getSize().x;
+	origin.y /= mUnscaledView.size().y/WindowManager::Instance().getSize().y;
 
 	return Rect(origin, size);
 }
@@ -117,8 +126,17 @@ Rect Camera::applyZoom(Rect input)
 	size.y *= zoom();
 
 	//Apply world boundary vs camera zoom
-	size.x /= mBoundary.x/WindowManager::Instance().getSize().x;
-	size.y /= mBoundary.x/WindowManager::Instance().getSize().x;
+	size.x /= mUnscaledView.size().x/WindowManager::Instance().getSize().x;
+	size.y /= mUnscaledView.size().y/WindowManager::Instance().getSize().y;
+
+	origin.x++;
+	origin.y++;
+
+	origin.x = floor(origin.x);
+	origin.y = floor(origin.y);
+
+	size.x = ceil(size.x);
+	size.y = ceil(size.y);
 
 	return Rect(origin, size);
 }

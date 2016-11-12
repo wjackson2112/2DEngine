@@ -3,17 +3,21 @@
 
 #include <SDL2/SDL.h>
 #include <iostream>
+#include "Shape.hpp"
+
+class Collider;
 
 class ColliderParent
 {
 public:
-	virtual void colliderCallback(ColliderParent *) = 0;
-	virtual void negotiateCollision(ColliderParent *) = 0;
+	Collider* collider;
+
+	virtual void colliderCallback(ColliderParent *, Shape* shape) = 0;
+	virtual void negotiateCollision(ColliderParent *, Shape* shape) = 0;
 };
 
 class Collider
 {
-
 	Shape* mShape;
 	int mPriority;
 	ColliderParent* mParent;
@@ -30,13 +34,12 @@ public:
 
 	void resolveCollision(Collider collider)
 	{
-		collider.mParent->colliderCallback(mParent);
-		mParent->colliderCallback(collider.mParent);
+		collider.mParent->colliderCallback(mParent, mShape);
+		mParent->colliderCallback(collider.mParent, collider.mShape);
 	}
 
 	friend bool intersects(Collider a, Collider b)
 	{
-
 		return a.mShape->intersects(b.mShape);
 	}
 
@@ -56,8 +59,8 @@ public:
 			{
 				while(intersects(a,b))
 				{
-					a.mParent->negotiateCollision(b.mParent);
-					b.mParent->negotiateCollision(a.mParent);
+					a.mParent->negotiateCollision(b.mParent, b.mShape);
+					b.mParent->negotiateCollision(a.mParent, a.mShape);
 				}
 			}
 		}
